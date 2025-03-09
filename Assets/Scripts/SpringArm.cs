@@ -1,18 +1,18 @@
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class SpringArm : MonoBehaviour {
-	public float TargetLength = 3.0f;
+	[Min(0)]
+	public float TargetLength = 5.0f;
 	public float SpeedDamp = 0.0f;
 	public Transform CollisionSocket;
 	public float CollisionRadius = 0.25f;
 	public LayerMask CollisionMask = 0;
 	public Camera Camera;
 	public float CameraViewportExtentsMultipllier = 1.0f;
-
-
+	
 	private Vector3 _socketVelocity;
-
-
+	
 	private void LateUpdate() {
 		if (Camera != null) {
 			CollisionRadius = GetCollisionRadiusForCamera(Camera);
@@ -23,14 +23,21 @@ public class SpringArm : MonoBehaviour {
 	}
 
 	private float GetCollisionRadiusForCamera(Camera cam) {
-		float halfFOV = (cam.fieldOfView / 2.0f) * Mathf.Deg2Rad; // vertical FOV in radians
+		float halfFOV = (cam.fieldOfView / 2.0f) * Mathf.Deg2Rad;
 		float nearClipPlaneHalfHeight = Mathf.Tan(halfFOV) * cam.nearClipPlane * CameraViewportExtentsMultipllier;
-		float nearClipPlaneHalfWidth = nearClipPlaneHalfHeight * cam.aspect;
-		float collisionRadius = new Vector2(nearClipPlaneHalfWidth, nearClipPlaneHalfHeight).magnitude; // Pythagoras
+		float collisionRadius = nearClipPlaneHalfHeight * Mathf.Sqrt(1 + cam.aspect * cam.aspect);
 
 		return collisionRadius;
 	}
+	
+	private void UpdateLength() {
+		float targetLength = GetDesiredTargetLength();
+		Vector3 newSocketLocalPosition = -Vector3.forward * targetLength;
 
+		CollisionSocket.localPosition = Vector3.SmoothDamp(
+			CollisionSocket.localPosition, newSocketLocalPosition, ref _socketVelocity, SpeedDamp);
+	}
+	
 	private float GetDesiredTargetLength() {
 		Ray ray = new Ray(transform.position, -transform.forward);
 		RaycastHit hit;
@@ -42,15 +49,7 @@ public class SpringArm : MonoBehaviour {
 			return TargetLength;
 		}
 	}
-
-	private void UpdateLength() {
-		float targetLength = GetDesiredTargetLength();
-		Vector3 newSocketLocalPosition = -Vector3.forward * targetLength;
-
-		CollisionSocket.localPosition = Vector3.SmoothDamp(
-			CollisionSocket.localPosition, newSocketLocalPosition, ref _socketVelocity, SpeedDamp);
-	}
-
+	
 	private void OnDrawGizmos() {
 		if (CollisionSocket != null) {
 			Gizmos.color = Color.green;
@@ -90,9 +89,5 @@ public class SpringArm : MonoBehaviour {
 		point.z = radius * Mathf.Cos(alpha);
 
 		return point;
-	}
-
-	public Transform GetTransform() {
-		return transform;
 	}
 }

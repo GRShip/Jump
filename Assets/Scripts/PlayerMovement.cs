@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,7 +7,7 @@ public class PlayerMovement : MonoBehaviour {
     private InputAction _actionMove;
     private CharacterController ctrl;
 
-    private GameObject springArm;
+    private Transform springArm;
     private Vector3 velocity = Vector3.zero;
     
     private Vector2 moveInput = Vector2.zero;
@@ -34,25 +35,32 @@ public class PlayerMovement : MonoBehaviour {
     public float mouseSensitivity = 10f;
     private float mouseYaw = 0f;
     private float mousePitch = 0f;
+    public Vector2 mousePitchClamp = new Vector2(-60f, 60f);
     
-    void Awake() {
+    private void Awake() {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        
         ctrl = GetComponent<CharacterController>();
         _actionMap = GetComponent<PlayerInput>().actions.FindActionMap("Player");
+        _actionMap.FindAction("Sprint").performed += ctx => { sprintInput = true; };
         _actionMap.FindAction("Sprint").canceled += ctx => { sprintInput = false; };
         _actionMap.FindAction("Jump").performed += JumpHoldStart;
         _actionMap.FindAction("Jump").canceled += JumpHoldEnd;
         
-        springArm = transform.Find("SpringArm").gameObject;
+        springArm = transform.Find("SpringArm");
     }
-    
-    void Update() {
+
+    private void FixedUpdate() {
         //중력
         velocity.y += gravity * Time.deltaTime;
-        if (ctrl.isGrounded == true && velocity.y < 0) {
+        if ((ctrl.isGrounded == true) && (velocity.y < 0)) {
             jumpCount = 0;
             velocity.y = -0.2f; //-0.2보다 크면 ctrl.isGrounded값이 불안정해짐
         }
+    }
 
+    private void Update() {
         //Debug.Log(jumpHoldFlag.ToString()+"  "+jumpHold.ToString()+"  "+jumpCount.ToString()+"/"+jumpCountMax.ToString());
         //점프
         if ((jumpHoldFlag == true) && (jumpHold < jumpHoldTime) && (jumpCount < jumpCountMax)) {
@@ -60,17 +68,15 @@ public class PlayerMovement : MonoBehaviour {
             jumpHold += Time.deltaTime;
         }
         
-        //마우스
+        //마우스 회전
         mouseYaw += mouseInput.x * mouseSensitivity * Time.deltaTime;
         mousePitch += -mouseInput.y * mouseSensitivity * Time.deltaTime;
-        mousePitch = Mathf.Clamp(mousePitch, -80f, 80f);
-        
-        // 수평 회전은 객체 자체 회전 (예: 플레이어 몸체)
+        mousePitch = Mathf.Clamp(mousePitch, mousePitchClamp.x, mousePitchClamp.y);
         transform.rotation = Quaternion.Euler(0f, mouseYaw, 0f);
-        springArm.transform.localRotation = Quaternion.Euler(mousePitch, 0f, 0f);
+        springArm.localRotation = Quaternion.Euler(mousePitch, 0f, 0f);
         
         //이동
-        float speed = sprintInput == true ? moveSpeed * sprintSpeed : moveSpeed;
+        float speed = sprintInput == true ? sprintSpeed : moveSpeed;
         Vector3 move = transform.TransformDirection(new Vector3(moveInput.x, 0, moveInput.y) * speed);
         
         //종합
@@ -81,9 +87,9 @@ public class PlayerMovement : MonoBehaviour {
         moveInput = input.Get<Vector2>();
     }
 
-    public void OnSprint(InputValue input) {
-        sprintInput = input.Get<float>() > 0;
-    }
+    //public void OnSprint(InputValue input) {
+    //    sprintInput = input.Get<float>() > 0;
+    //}
     
     public void OnJump(InputValue input) {
         if (jumpCount < jumpCountMax) {
