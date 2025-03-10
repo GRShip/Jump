@@ -13,4 +13,12 @@ public class test : MonoBehaviour {
 
     // Update is called once per frame
     void Update() { }
+
+    public void OnFootstep(AnimationEvent animationEvent) {
+        aDelegate?.Invoke(animationEvent);
+    }
+
+    public void OnLand(AnimationEvent animationEvent) {
+        bDelegate?.Invoke(animationEvent);
+    }
 }

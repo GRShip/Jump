@@ -135,8 +135,6 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     public void OnLand(AnimationEvent animationEvent) {
-        if (animationEvent.animatorClipInfo.weight > 0.5f) {
-            Debug.Log("LandSound");
-        }
+        Debug.Log("LandSound");
     }
 }
