@@ -1274,9 +1274,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1743751892}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 66b75325ea0c5e54abe1092d5df67c49, type: 3}
+  m_Script: {fileID: 11500000, guid: 1937bf3eb44b6ec469c69de26fdfeda4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveInput: {x: 0, y: 0}
+  lookInput: {x: 0, y: 0}
+  jumpInput: 0
+  sprintInput: 0
+  analogMovement: 0
+  cursorLocked: 1
+  cursorInputForLook: 1
 --- !u!1 &1800776638
 GameObject:
   m_ObjectHideFlags: 0
