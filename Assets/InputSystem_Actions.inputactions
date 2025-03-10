@@ -27,10 +27,10 @@
                     "name": "Wheel",
                     "type": "PassThrough",
                     "id": "db6be35f-9740-4995-aaf8-7ebcfdb6e9fb",
-                    "expectedControlType": "Vector2",
+                    "expectedControlType": "Axis",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Interact",
@@ -348,7 +348,7 @@
                 {
                     "name": "",
                     "id": "a0a185dd-71ab-408c-9187-84a0920c8995",
-                    "path": "<Mouse>/scroll",
+                    "path": "<Mouse>/scroll/y",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",

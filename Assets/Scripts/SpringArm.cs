@@ -1,93 +1,51 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-[ExecuteInEditMode]
+//[ExecuteInEditMode]
 public class SpringArm : MonoBehaviour {
-	[Min(0)]
-	public float TargetLength = 5.0f;
-	public float SpeedDamp = 0.0f;
-	public Transform CollisionSocket;
-	public float CollisionRadius = 0.25f;
-	public LayerMask CollisionMask = 0;
-	public Camera Camera;
-	public float CameraViewportExtentsMultipllier = 1.0f;
+	private Transform arm;
+	private Vector3 armVelocity;
+
+	[Min(0)] public float length = 5.0f;
+	public float smoothTime = 0.5f;
+	public float radius = 0.25f;
+	public LayerMask collisionMask = -1;
 	
-	private Vector3 _socketVelocity;
+	private void Awake() {
+		arm = transform.Find("SpringArmTarget");
+	}
 	
 	private void LateUpdate() {
-		if (Camera != null) {
-			CollisionRadius = GetCollisionRadiusForCamera(Camera);
-			Camera.transform.localPosition = -Vector3.forward * Camera.nearClipPlane;
+		float armLength = GetLength();
+		Vector3 armPosition = Vector3.back * armLength;
+		
+		arm.localPosition = Vector3.SmoothDamp(arm.localPosition, armPosition, ref armVelocity, smoothTime);
+	}
+
+	public void OnWheel(InputValue input) {
+		if (input.Get<float>() == 0) {
+			return;
 		}
-
-		UpdateLength();
+		float value = input.Get<float>() > 0f ? -0.5f : 0.5f;
+		length += value;
+		length = Mathf.Clamp(length, 1, 10);
 	}
 
-	private float GetCollisionRadiusForCamera(Camera cam) {
-		float halfFOV = (cam.fieldOfView / 2.0f) * Mathf.Deg2Rad;
-		float nearClipPlaneHalfHeight = Mathf.Tan(halfFOV) * cam.nearClipPlane * CameraViewportExtentsMultipllier;
-		float collisionRadius = nearClipPlaneHalfHeight * Mathf.Sqrt(1 + cam.aspect * cam.aspect);
-
-		return collisionRadius;
-	}
-	
-	private void UpdateLength() {
-		float targetLength = GetDesiredTargetLength();
-		Vector3 newSocketLocalPosition = -Vector3.forward * targetLength;
-
-		CollisionSocket.localPosition = Vector3.SmoothDamp(
-			CollisionSocket.localPosition, newSocketLocalPosition, ref _socketVelocity, SpeedDamp);
-	}
-	
-	private float GetDesiredTargetLength() {
+	private float GetLength() {
 		Ray ray = new Ray(transform.position, -transform.forward);
 		RaycastHit hit;
 
-		if (Physics.SphereCast(ray, Mathf.Max(0.001f, CollisionRadius), out hit, TargetLength, CollisionMask)) {
+		if (Physics.SphereCast(ray, Mathf.Max(0.01f, radius), out hit, length, collisionMask)) {
 			return hit.distance;
 		}
-		else {
-			return TargetLength;
-		}
+		return length;
 	}
 	
 	private void OnDrawGizmos() {
-		if (CollisionSocket != null) {
+		if (arm != null) {
 			Gizmos.color = Color.green;
-			Gizmos.DrawLine(transform.position, CollisionSocket.transform.position);
-			DrawGizmoSphere(CollisionSocket.transform.position, CollisionRadius);
+			Gizmos.DrawLine(transform.position, arm.position);
+			Gizmos.DrawWireSphere(arm.position, radius);
 		}
-	}
-
-	private void DrawGizmoSphere(Vector3 pos, float radius) {
-		Quaternion rot = Quaternion.Euler(-90.0f, 0.0f, 0.0f);
-
-		int alphaSteps = 8;
-		int betaSteps = 16;
-
-		float deltaAlpha = Mathf.PI / alphaSteps;
-		float deltaBeta = 2.0f * Mathf.PI / betaSteps;
-
-		for (int a = 0; a < alphaSteps; a++) {
-			for (int b = 0; b < betaSteps; b++) {
-				float alpha = a * deltaAlpha;
-				float beta = b * deltaBeta;
-
-				Vector3 p1 = pos + rot * GetSphericalPoint(alpha, beta, radius);
-				Vector3 p2 = pos + rot * GetSphericalPoint(alpha + deltaAlpha, beta, radius);
-				Vector3 p3 = pos + rot * GetSphericalPoint(alpha + deltaAlpha, beta - deltaBeta, radius);
-
-				Gizmos.DrawLine(p1, p2);
-				Gizmos.DrawLine(p2, p3);
-			}
-		}
-	}
-
-	private Vector3 GetSphericalPoint(float alpha, float beta, float radius) {
-		Vector3 point;
-		point.x = radius * Mathf.Sin(alpha) * Mathf.Cos(beta);
-		point.y = radius * Mathf.Sin(alpha) * Mathf.Sin(beta);
-		point.z = radius * Mathf.Cos(alpha);
-
-		return point;
 	}
 }
