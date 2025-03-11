@@ -5,7 +5,7 @@ using UnityEngine;
 public class JackOBox : MonoBehaviour
 {
     float time = 0;
-    public float cooltime = 3f;
+    public float cooltime = 2f;
     float pushtime = 0.2f;      //피격 시 PC가 래그돌 되는 시간
 
     enum state
@@ -62,7 +62,7 @@ public class JackOBox : MonoBehaviour
 
     IEnumerator Stop()
     {
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(1f);
         stat = state.Back;
     }
 }

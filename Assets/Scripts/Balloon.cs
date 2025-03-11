@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Balloon : MonoBehaviour
 {
-    public float speed = 3;
+    public float speed = 2;
     float pushtime = 0.5f;      //피격 시 PC가 래그돌 되는 시간
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
