@@ -27,11 +27,13 @@ public class ThirdPersonRagdoll : MonoBehaviour {
         if (animator != null) {
             animator.enabled = !state;
         }
-        
+
         foreach (Rigidbody rb in ragdollBodies) {
+            if (state == false) {
+                rb.linearVelocity = velocity;
+                rb.angularVelocity = Vector3.zero;
+            }
             rb.isKinematic = !state;
-            rb.linearVelocity = velocity;
-            rb.angularVelocity = Vector3.zero;
         }
 
         foreach (Collider col in ragdollColliders) {
@@ -44,10 +46,10 @@ public class ThirdPersonRagdoll : MonoBehaviour {
     private IEnumerator WaitPhysicsUpdate(Vector3 velocity) {
         // FixedUpdate까지 대기
         yield return new WaitForFixedUpdate();
+        //yield return new WaitForSeconds(0.02f);
 
         foreach (Rigidbody rb in ragdollBodies) {
-            rb.linearVelocity = velocity;
-            rb.angularVelocity = Vector3.zero;
+            rb.AddForce(velocity, ForceMode.VelocityChange);
         }
     }
 }

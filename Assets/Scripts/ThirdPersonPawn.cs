@@ -3,19 +3,18 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class ThirdPersonPawn : MonoBehaviour {
+    private ThirdPersonController _playerManager;
+    private PlayerInput _playerInput;
+    private ThirdPersonRagdoll _tpRagdoll;
+    
+    public Action<GameObject> onDestroyed;
+    
     [Header("Temp")]
     [Tooltip("설정")]
     public int hpMax = 100;
-
     private int _hp = 100;
-
-    public Action<GameObject> onDestroyed;
-
+    
     public GameObject cameraPosition;
-
-    private ThirdPersonController _playerManager;
-    private PlayerInput _playerInput = null;
-    private ThirdPersonRagdoll _tpRagdoll;
 
     public bool HasController { get; private set; }
 
@@ -30,7 +29,7 @@ public class ThirdPersonPawn : MonoBehaviour {
 
     private void Update() {
         //Debug
-        if (Input.GetMouseButtonDown(1)) {
+        if (Input.GetMouseButtonDown(1) && HasController == true) {
             PlayerDestroy();
         }
     }
@@ -53,6 +52,8 @@ public class ThirdPersonPawn : MonoBehaviour {
         
         if (onDestroyed != null) {
             onDestroyed(gameObject);
+            onDestroyed = null;
         }
+        Debug.Log("Unpossess");
     }
 }
