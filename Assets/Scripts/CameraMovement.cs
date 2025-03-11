@@ -6,10 +6,10 @@ public class CameraMovement : MonoBehaviour {
     private bool posFlag = false;
     private Vector3 posVelocity = Vector3.zero;
     [Tooltip("오프셋")] public Vector3 posOffset;
-    [Range(0f, 1f), Tooltip("위치 보간 시간")] public float posSmoothTime = 0.2F;
+    [Range(0f, 1f), Tooltip("위치 보간 시간")] public float posSmoothTime = 0.1f;
 
     private bool rotFlag = false;
-    [Range(0f, 1f), Tooltip("회전 보간 속도")] public float rotSmoothSpeed = 5f;
+    [Range(0f, 1f), Tooltip("회전 보간 속도")] public float rotSmoothSpeed = 1f;
 
     private void LateUpdate() {
         if (target == null) {
@@ -50,7 +50,7 @@ public class CameraMovement : MonoBehaviour {
         rotFlag = true;
     }
 
-    private void ChangeTarget(Transform next) {
+    public void ChangeTarget(Transform next) {
         target = next;
         posVelocity = Vector3.zero;
         posFlag = false;

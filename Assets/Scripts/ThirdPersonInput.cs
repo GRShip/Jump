@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(PlayerInput))]
 public class ThirdPersonInput : MonoBehaviour {
     [Header("입력")]
