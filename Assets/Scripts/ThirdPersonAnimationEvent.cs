@@ -7,7 +7,7 @@ public class FootstepEvent : UnityEvent<AnimationEvent> { }
 [System.Serializable]
 public class LandEvent : UnityEvent<AnimationEvent> { }
 
-public class ThirdPersonAnimationEvent : MonoBehaviour {
+public class ThirdPersonAnimationEvent : MonoBehaviour, IPawnComponent {
     public delegate void Footstep(AnimationEvent animationEvent);
     Footstep delegateFootstep;
     
@@ -33,5 +33,12 @@ public class ThirdPersonAnimationEvent : MonoBehaviour {
     public void OnLand(AnimationEvent animationEvent) {
         //delegateLand?.Invoke(animationEvent);
         EventLand?.Invoke(animationEvent);
+    }
+    
+    public void DeActive() {
+        enabled = false;
+    }
+    public void Active() {
+        //throw new System.NotImplementedException();
     }
 }

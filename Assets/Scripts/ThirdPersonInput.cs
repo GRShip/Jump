@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(PlayerInput))]
-public class ThirdPersonInput : MonoBehaviour {
+public class ThirdPersonInput : MonoBehaviour, IPawnComponent {
     [Header("입력")]
     [Tooltip("이동 입력값")]
     public Vector2 moveInput;
@@ -12,12 +12,6 @@ public class ThirdPersonInput : MonoBehaviour {
     public bool jumpInput;
     [Tooltip("달리기 입력값")]
     public bool sprintInput;
-
-    [Header("입력 설정")]
-    [Tooltip("아날로그")]
-    public bool analogMovement;
-    [Tooltip("마우스잠금")]
-    public bool cursorLocked = true;
     
     public void OnMove(InputValue value) {
         MoveInput(value.Get<Vector2>());
@@ -50,12 +44,11 @@ public class ThirdPersonInput : MonoBehaviour {
     public void SprintInput(bool newSprint) {
         sprintInput = newSprint;
     }
-
-    private void OnApplicationFocus(bool hasFocus) {
-        SetCursorState(cursorLocked);
+    
+    public void DeActive() {
+        enabled = false;
     }
-
-    private void SetCursorState(bool newState) {
-        Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
+    public void Active() {
+        //throw new System.NotImplementedException();
     }
 }

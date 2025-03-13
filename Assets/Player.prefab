@@ -48,7 +48,7 @@ GameObject:
   - component: {fileID: 9169648451253349628}
   m_Layer: 8
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -213,7 +213,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c5461f2bb914a24399e729dfb3c5706, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hpMax: 100
   cameraPosition: {fileID: 1089286247897966241}
 --- !u!114 &5764149996079739347
 MonoBehaviour:
@@ -231,8 +230,6 @@ MonoBehaviour:
   lookInput: {x: 0, y: 0}
   jumpInput: 0
   sprintInput: 0
-  analogMovement: 0
-  cursorLocked: 0
 --- !u!114 &2747414795668782167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -251,7 +248,7 @@ MonoBehaviour:
   rotationSmoothTime: 0.15
   jumpPower: 2
   jumpCountMax: 1
-  _jumpCount: 0
+  jumpCount: 0
   jumpHoldTime: 0.25
   gravityPower: -19.62
   onGround: 1
@@ -405,6 +402,7 @@ GameObject:
   m_Component:
   - component: {fileID: 218351312652450956}
   - component: {fileID: 7573734715590330922}
+  - component: {fileID: 2701284930385367223}
   m_Layer: 8
   m_Name: SpringArm
   m_TagString: Untagged
@@ -443,6 +441,22 @@ MonoBehaviour:
   length: 5
   smoothTime: 0.5
   radius: 0.25
+  collisionLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &2701284930385367223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6634916148555396356}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3df5fff03d4caf147a755c21e4836965, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  length: 5
   collisionLayer:
     serializedVersion: 2
     m_Bits: 4294967295

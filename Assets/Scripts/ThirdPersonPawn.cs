@@ -2,29 +2,29 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class ThirdPersonPawn : MonoBehaviour {
-    private ThirdPersonController _playerManager;
-    private PlayerInput _playerInput;
-    private ThirdPersonRagdoll _tpRagdoll;
+public class ThirdPersonPawn : MonoBehaviour, IPawn {
+    public ThirdPersonController PlayerManager { get; set; }   
+    public Action<GameObject> OnDestroyed;
     
-    public Action<GameObject> onDestroyed;
+    private PlayerInput playerInput;
+    private ThirdPersonRagdoll tpRagdoll;
     
     [Header("Temp")]
     [Tooltip("설정")]
-    public int hpMax = 100;
-    private int _hp = 100;
+    //public int hpMax = 100;
+    //private int _hp = 100;
     
     public GameObject cameraPosition;
 
     public bool HasController { get; private set; }
 
     private void Awake() {
-        _playerManager = null;
-        _playerInput = GetComponent<PlayerInput>();
-        _tpRagdoll = transform.Find("Mannequin").GetComponent<ThirdPersonRagdoll>();
+        PlayerManager = null;
+        playerInput = GetComponent<PlayerInput>();
+        tpRagdoll = transform.Find("Mannequin").GetComponent<ThirdPersonRagdoll>();
         
         HasController = false;
-        _playerInput.enabled = false;
+        playerInput.enabled = false;
     }
 
     private void Update() {
@@ -35,25 +35,42 @@ public class ThirdPersonPawn : MonoBehaviour {
     }
 
     public void PlayerDestroy() {
-        _tpRagdoll.SetRagdollState(true);
-        Unpossess();
+        tpRagdoll.SetRagdollState(true);
+        UnPossess();
     }
 
     public void Possess(ThirdPersonController controller) {
-        _playerManager = controller;
+        PlayerManager = controller;
         HasController = true;
-        _playerInput.enabled = true;
+        playerInput.enabled = true;
     }
 
-    public void Unpossess() {
-        _playerManager = null;
+    public void UnPossess() {
+        PlayerManager = null;
         HasController = false;
-        _playerInput.enabled = false;
+        playerInput.enabled = false;
+        TriggerChildFunctions();
         
-        if (onDestroyed != null) {
-            onDestroyed(gameObject);
-            onDestroyed = null;
+        if (OnDestroyed != null) {
+            OnDestroyed(gameObject);
+            OnDestroyed = null;
         }
-        Debug.Log("Unpossess");
+    }
+
+    public void TriggerChildFunctions() {
+        IPawnComponent[] functionComponents = GetComponentsInChildren<IPawnComponent>();
+        
+        foreach (IPawnComponent component in functionComponents) {
+            component.DeActive();
+        }
+    }
+    
+    private void OnTriggerEnter(Collider other) {
+        if (other.gameObject.CompareTag("SavePoint")) {
+            if (HasController == true) {
+                Debug.Log("SavePoint");
+                ThirdPersonController.Instance.SavePosition(other.gameObject.transform);
+            }
+        }
     }
 }

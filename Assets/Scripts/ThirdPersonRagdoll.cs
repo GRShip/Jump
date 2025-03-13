@@ -17,7 +17,6 @@ public class ThirdPersonRagdoll : MonoBehaviour {
     }
     
     public void SetRagdollState(bool state) {
-        Debug.Log(gameObject.name+" RagdollState: " + state);
         Vector3 velocity = Vector3.zero;
         if (controller != null) {
             controller.enabled = !state;

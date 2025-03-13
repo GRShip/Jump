@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 //[ExecuteInEditMode]
-public class SpringArm : MonoBehaviour {
+public class SpringArm : MonoBehaviour, IPawnComponent {
 	private Transform _arm;
 	private Vector3 _armVelocity;
 
@@ -49,5 +49,12 @@ public class SpringArm : MonoBehaviour {
 			Gizmos.DrawLine(transform.position, _arm.position);
 			Gizmos.DrawWireSphere(_arm.position, radius);
 		}
+	}
+	
+	public void DeActive() {
+		enabled = false;
+	}
+	public void Active() {
+		//throw new System.NotImplementedException();
 	}
 }

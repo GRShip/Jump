@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(CharacterController))]
-public class ThirdPersonMovement : MonoBehaviour {
-    private CharacterController _ctrl;
-    private Animator _animator;
-    private ThirdPersonInput _input;
+public class ThirdPersonMovement : MonoBehaviour, IPawnComponent {
+    private CharacterController ctrl;
+    private Animator animator;
+    private ThirdPersonInput input;
     
     [Header("플레이어")]
     [Tooltip("걷기속도")]
@@ -17,25 +18,26 @@ public class ThirdPersonMovement : MonoBehaviour {
     [Tooltip("회전보간시간")]
     [Range(0.0f, 0.3f)]
     public float rotationSmoothTime = 0.15f;
-    private float _hspeed = 0f;
+    private float hspeed = 0f;
     
     [Space(5)]
     [Tooltip("점프 세기")]
     public float jumpPower = 2f;
     [Tooltip("최대 점프 횟수"), Min(1)]
     public int jumpCountMax = 1;
+    [FormerlySerializedAs("_jumpCount")]
     [SerializeField]
-    private int _jumpCount = 0;
+    private int jumpCount = 0;
     [Tooltip("점프 유지시간"), Range(0, 0.5f)]
     public float jumpHoldTime = 0.25f;
-    private float _jumpHold = 0;
-    private bool _jumpHoldFlag = false;
+    private float jumpHold = 0;
+    private bool jumpHoldFlag = false;
     [Tooltip("중력 세기")]
     public float gravityPower = -9.81f;
-    private float _fallDelay = 0.15f;
-    private float _vspeed = 0f;
-    private float _vspeedMax = 53.0f;
-    private float _fallTime = 0f;
+    private float vspeed = 0f;
+    private const float vspeedMax = 53.0f;
+    private float fallTime = 0f;
+    private const float FallDelay = 0.15f;
     
     [Space(5)]
     [Header("땅")]
@@ -56,20 +58,20 @@ public class ThirdPersonMovement : MonoBehaviour {
     public float forwardPitchBottom = -60.0f;
     [Tooltip("회전감도")]
     public float forwardRotationRate = 10f;
-    private float _forwardYaw = 0f;
-    private float _forwardPitch = 0f;
-    private float _targetRotation = 0f;
-    private float _rotationVelocity = 0f;
+    private float forwardYaw = 0f;
+    private float forwardPitch = 0f;
+    private float targetRotation = 0f;
+    private float rotationVelocity = 0f;
 
-    private int _animIDSpeed;
-    private int _animIDLand;
-    private int _animIDJump;
-    private int _animIDFall;
+    private int animIDSpeed;
+    private int animIDLand;
+    private int animIDJump;
+    private int animIDFall;
     
     private void Awake() {
-        _ctrl = GetComponent<CharacterController>();
-        _animator = GetComponentInChildren<Animator>();
-        _input = GetComponent<ThirdPersonInput>();
+        ctrl = GetComponent<CharacterController>();
+        animator = GetComponentInChildren<Animator>();
+        input = GetComponent<ThirdPersonInput>();
     }
 
     private void Start() {
@@ -78,7 +80,7 @@ public class ThirdPersonMovement : MonoBehaviour {
 
     private void Update() {
         //if (TryGetComponent(out _ctrl) == false) {
-        if (_ctrl.enabled == false) {
+        if (ctrl.enabled == false) {
             return;
         }
 
@@ -89,116 +91,116 @@ public class ThirdPersonMovement : MonoBehaviour {
     }
     
     private void AssignAnimation() {
-        _animIDSpeed = Animator.StringToHash("Speed");
-        _animIDLand = Animator.StringToHash("Land");
-        _animIDJump = Animator.StringToHash("Jump");
-        _animIDFall = Animator.StringToHash("Fall");
+        animIDSpeed = Animator.StringToHash("Speed");
+        animIDLand = Animator.StringToHash("Land");
+        animIDJump = Animator.StringToHash("Jump");
+        animIDFall = Animator.StringToHash("Fall");
     }
     
     private void Gravity() {
         if (onGround == true) {
-            _animator.SetBool(_animIDJump, false);
-            _animator.SetBool(_animIDFall, false);
+            animator.SetBool(animIDJump, false);
+            animator.SetBool(animIDFall, false);
             
-            _fallTime = _fallDelay;
+            fallTime = FallDelay;
             
-            _jumpCount = 0;
-            _jumpHold = 0;
+            jumpCount = 0;
+            jumpHold = 0;
             
-            if (_vspeed < 0.0f) {
-                _vspeed = -2f;  //-0.2보다 크면 ctrl.isGrounded값이 불안정해짐
+            if (vspeed < 0.0f) {
+                vspeed = -2f;  //-0.2보다 크면 ctrl.isGrounded값이 불안정해짐
             }
         }
         else {
-            if (_fallTime >= 0f) {
-                _fallTime -= Time.deltaTime;
+            if (fallTime >= 0f) {
+                fallTime -= Time.deltaTime;
             }
             else {
-                _animator.SetBool(_animIDFall, true);
+                animator.SetBool(animIDFall, true);
             }
         }
         
-        if (_input.jumpInput == true) {
-            if (_jumpCount < jumpCountMax) {
-                if (_jumpHoldFlag == false) {
-                    _jumpCount += 1;
-                    _jumpHold = 0;
-                    _jumpHoldFlag = true;
-                    _animator.SetBool(_animIDJump, true);
+        if (input.jumpInput == true) {
+            if (jumpCount < jumpCountMax) {
+                if (jumpHoldFlag == false) {
+                    jumpCount += 1;
+                    jumpHold = 0;
+                    jumpHoldFlag = true;
+                    animator.SetBool(animIDJump, true);
                 }
             }
         }
         else {
-            _jumpHoldFlag = false;
+            jumpHoldFlag = false;
         }
 
-        if (_jumpHoldFlag == true) {
-            _vspeed = Mathf.Sqrt(jumpPower * -2f * gravityPower);
-            _jumpHold += Time.deltaTime;
-            if (_jumpHold > jumpHoldTime) {
-                _jumpHoldFlag = false;
+        if (jumpHoldFlag == true) {
+            vspeed = Mathf.Sqrt(jumpPower * -2f * gravityPower);
+            jumpHold += Time.deltaTime;
+            if (jumpHold > jumpHoldTime) {
+                jumpHoldFlag = false;
             }
         }
         
-        if (_vspeed < _vspeedMax) {
-            _vspeed += gravityPower * Time.deltaTime;
+        if (vspeed < vspeedMax) {
+            vspeed += gravityPower * Time.deltaTime;
         }
     }
 
     private void GroundedCheck() {
         Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - groundOffset, transform.position.z);
-        onGround = Physics.CheckSphere(spherePosition, _ctrl.radius, groundLayer, QueryTriggerInteraction.Ignore);
+        onGround = Physics.CheckSphere(spherePosition, ctrl.radius, groundLayer, QueryTriggerInteraction.Ignore);
 
-        onGround = _ctrl.isGrounded;
-        _animator.SetBool(_animIDLand, onGround);
+        onGround = ctrl.isGrounded;
+        animator.SetBool(animIDLand, onGround);
     }
     
     private void CameraRotation() {
-        if (_input.lookInput.sqrMagnitude >= 0.01f) {
+        if (input.lookInput.sqrMagnitude >= 0.01f) {
             //마우스 이동
-            _forwardYaw += _input.lookInput.x * Time.deltaTime * forwardRotationRate;
-            _forwardPitch += -_input.lookInput.y * Time.deltaTime * forwardRotationRate;
+            forwardYaw += input.lookInput.x * Time.deltaTime * forwardRotationRate;
+            forwardPitch += -input.lookInput.y * Time.deltaTime * forwardRotationRate;
         }
         
         //오버플로방지
-        _forwardYaw = Mathf.Clamp(_forwardYaw, float.MinValue, float.MaxValue);
-        _forwardPitch = Mathf.Clamp(_forwardPitch, forwardPitchBottom, forwardPitchTop);
+        forwardYaw = Mathf.Clamp(forwardYaw, float.MinValue, float.MaxValue);
+        forwardPitch = Mathf.Clamp(forwardPitch, forwardPitchBottom, forwardPitchTop);
         
         //회전
-        forwardPosition.transform.rotation = Quaternion.Euler(_forwardPitch, _forwardYaw, 0.0f);
+        forwardPosition.transform.rotation = Quaternion.Euler(forwardPitch, forwardYaw, 0.0f);
     }
 
     private void Move() {
         //목표 속도
-        float targetSpeed = _input.sprintInput ? sprintSpeed : moveSpeed;
-        if (_input.moveInput == Vector2.zero) {
+        float targetSpeed = input.sprintInput ? sprintSpeed : moveSpeed;
+        if (input.moveInput == Vector2.zero) {
             targetSpeed = 0.0f;
         }
         
         //현재 속도
-        float currentSpeed = new Vector3(_ctrl.velocity.x, 0.0f, _ctrl.velocity.z).magnitude;
+        float currentSpeed = new Vector3(ctrl.velocity.x, 0.0f, ctrl.velocity.z).magnitude;
         if (Mathf.Abs(currentSpeed - targetSpeed) < 0.1f) {
-            _hspeed = targetSpeed;
+            hspeed = targetSpeed;
         } else {
-            _hspeed = Mathf.Lerp(currentSpeed, targetSpeed, Time.deltaTime * speedChangeRate);
+            hspeed = Mathf.Lerp(currentSpeed, targetSpeed, Time.deltaTime * speedChangeRate);
         }
         
-        Vector3 inputDirection = new Vector3(_input.moveInput.x, 0.0f, _input.moveInput.y).normalized;
+        Vector3 inputDirection = new Vector3(input.moveInput.x, 0.0f, input.moveInput.y).normalized;
         //입력 방향
-        if (_input.moveInput != Vector2.zero) {
-            _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + forwardPosition.transform.eulerAngles.y;
+        if (input.moveInput != Vector2.zero) {
+            targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + forwardPosition.transform.eulerAngles.y;
             
-            float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, rotationSmoothTime);
+            float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref rotationVelocity, rotationSmoothTime);
             
             transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
         }
         
         //이동
-        Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
-        _ctrl.Move((targetDirection.normalized * _hspeed + new Vector3(0.0f, _vspeed, 0.0f)) * Time.deltaTime);
+        Vector3 targetDirection = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
+        ctrl.Move((targetDirection.normalized * hspeed + new Vector3(0.0f, vspeed, 0.0f)) * Time.deltaTime);
         
         //애니메이터
-        _animator.SetFloat(_animIDSpeed, _hspeed);
+        animator.SetFloat(animIDSpeed, hspeed);
     }
     
     
@@ -211,5 +213,18 @@ public class ThirdPersonMovement : MonoBehaviour {
 
     public void OnLand(AnimationEvent animationEvent) {
         Debug.Log("LandSound");
+    }
+    
+    public void DeActive() {
+        enabled = false;
+    }
+    public void Active() {
+        //throw new System.NotImplementedException();
+    }
+    
+    public void OnInteract(InputValue value) {
+        if (value.isPressed) {
+            Debug.Log("InteractSound");
+        }
     }
 }
