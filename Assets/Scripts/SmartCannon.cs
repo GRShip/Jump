@@ -46,7 +46,15 @@ public class SmartCannon : MonoBehaviour
                 if (Physics.Raycast(ray, out hitInfo))
                 {
                     Vector3 localPosition = transform.InverseTransformPoint(hitInfo.point);
-                    projector.pivot = localPosition;
+
+                    if (time < cooltime - 1)
+                    {
+                        projector.pivot = localPosition;
+                    }
+                    else
+                    {
+                        projector.pivot = Vector3.zero;
+                    }
                 }
 
                 if (time >= cooltime)
@@ -64,9 +72,6 @@ public class SmartCannon : MonoBehaviour
 
     IEnumerator FireCannon()
     {
-        projector.pivot = Vector3.zero;
-
-        yield return new WaitForSeconds(1f);
         Rigidbody balloonInstance = Instantiate(cannonball, fireTransform.position, fireTransform.rotation);
         balloonInstance.AddForce(transform.forward.normalized * power, ForceMode.Impulse);
 
