@@ -4,14 +4,13 @@ using UnityEngine.AI;
 public class Bear : MonoBehaviour
 {
     public GameObject player;
-    public float sight = 7;
-    public float range = 1.3f;
+    public float sight = 12f;
+    public float range = 2.7f;
     public float pushtime = 0.5f;
     public float attPushtime = 1.5f;
-    public float speed = 3;
 
     float currentTime = 0;
-    float attackDelay = 2f;
+    float attackDelay = 1f;
 
     Vector3 originPos;
     Quaternion originRot;
@@ -34,6 +33,8 @@ public class Bear : MonoBehaviour
     {
         stat = State.Idle;
         cc = GetComponent<CharacterController>();
+        agent = GetComponent<NavMeshAgent>();
+        anim = GetComponent<Animator>();
         originPos = transform.position;
         originRot = transform.rotation;
     }
@@ -110,9 +111,8 @@ public class Bear : MonoBehaviour
 
     public void AttackAction()
     {
-        //ㄴ공격 애니메이션에 이벤트로 실행하기
         //플레이어 래그돌화 추가하기
-        player.GetComponent<Rigidbody>().AddForce(transform.eulerAngles.normalized * 3);
+        //플레이어 밀치기 추가하기
     }
 
     void Return()
@@ -126,6 +126,7 @@ public class Bear : MonoBehaviour
 
             if (currentTime > 1f && Vector3.Distance(transform.position, player.transform.position) < sight)
             {
+                currentTime = 0;
                 stat = State.Chase;
                 anim.SetTrigger("Chase");
             }
