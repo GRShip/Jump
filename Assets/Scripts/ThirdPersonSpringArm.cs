@@ -1,18 +1,28 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 //[ExecuteInEditMode]
-public class SpringArm : MonoBehaviour, IPawnComponent {
-	private Transform _arm;
+public class ThirdPersonSpringArm : MonoBehaviour {
+	public Transform _arm { get; private set; }
 	private Vector3 _armVelocity;
 
 	[Min(0)] public float length = 5.0f;
 	public float smoothTime = 0.5f;
 	public float radius = 0.25f;
-	public LayerMask collisionLayer = -1;
+	public LayerMask collisionLayer = 7;
+	
+	private GameObject ragdollPosition;
+	private bool ragdoll = false;
 	
 	private void Awake() {
 		_arm = transform.Find("SpringArmTarget");
+	}
+	
+	private void FixedUpdate() {
+		if (ragdoll == true) {
+			transform.position = ragdollPosition.transform.position + new Vector3(0f, 1.08f, 0f);
+		}
 	}
 	
 	private void LateUpdate() {
@@ -50,11 +60,21 @@ public class SpringArm : MonoBehaviour, IPawnComponent {
 			Gizmos.DrawWireSphere(_arm.position, radius);
 		}
 	}
+
+	public void SetRagdoll(GameObject position) {
+		ragdollPosition = position;
+		ragdoll = true;
+	}
+
+	public void ResetRagdoll() {
+		ragdoll = false;
+		transform.localPosition = new Vector3(0, 2, 0);
+	}
 	
 	public void DeActive() {
 		enabled = false;
 	}
 	public void Active() {
-		//throw new System.NotImplementedException();
+		enabled = true;
 	}
 }

@@ -2,10 +2,11 @@
 using UnityEngine;
 
 public class ThirdPersonRagdoll : MonoBehaviour {
-    public CharacterController controller;
-    public Rigidbody[] ragdollBodies;
-    public Collider[] ragdollColliders;
-    public Animator animator;
+    private CharacterController controller;
+    private Rigidbody[] ragdollBodies;
+    private Collider[] ragdollColliders;
+    private Animator animator;
+    public GameObject hips;
     
     void Awake() {
         controller = GetComponentInParent<CharacterController>();
@@ -50,5 +51,9 @@ public class ThirdPersonRagdoll : MonoBehaviour {
         foreach (Rigidbody rb in ragdollBodies) {
             rb.AddForce(velocity, ForceMode.VelocityChange);
         }
+    }
+
+    public Transform GetRagdollTransform() {
+        return hips.transform;
     }
 }

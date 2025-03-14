@@ -26,7 +26,7 @@ public class ThirdPersonInteract : MonoBehaviour, IPawnComponent {
         enabled = false;
     }
     public void Active() {
-        //throw new System.NotImplementedException();
+        enabled = true;
     }
 
     public void OnInteract(InputValue value) {

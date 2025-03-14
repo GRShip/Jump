@@ -49,6 +49,6 @@ public class ThirdPersonInput : MonoBehaviour, IPawnComponent {
         enabled = false;
     }
     public void Active() {
-        //throw new System.NotImplementedException();
+        enabled = true;
     }
 }

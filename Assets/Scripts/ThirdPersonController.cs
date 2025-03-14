@@ -67,7 +67,7 @@ public class ThirdPersonController : MonoBehaviour {
 					PlayerDestroyed();
 				}
 			};
-			Camera.main.GetComponent<CameraMovement>().ChangeTarget(pawn.cameraPosition.transform);
+			Camera.main.GetComponent<CameraMovement>().ChangeTarget(pawn.cameraPosition._arm.transform);
 		}
 		else {
 			Debug.LogWarning("생성된 플레이어에 ThirdPersonPawn 컴포넌트가 없음.");

@@ -39,6 +39,6 @@ public class ThirdPersonAnimationEvent : MonoBehaviour, IPawnComponent {
         enabled = false;
     }
     public void Active() {
-        //throw new System.NotImplementedException();
+        enabled = true;
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class CameraMovement : MonoBehaviour {
@@ -10,7 +11,7 @@ public class CameraMovement : MonoBehaviour {
 
     private bool rotFlag = false;
     [Range(0f, 1f), Tooltip("회전 보간 속도")] public float rotSmoothSpeed = 1f;
-
+    
     private void LateUpdate() {
         if (target == null) {
             return;

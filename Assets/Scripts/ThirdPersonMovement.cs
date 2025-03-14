@@ -149,7 +149,7 @@ public class ThirdPersonMovement : MonoBehaviour, IPawnComponent {
 
     private void GroundedCheck() {
         Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - groundOffset, transform.position.z);
-        onGround = Physics.CheckSphere(spherePosition, ctrl.radius, groundLayer, QueryTriggerInteraction.Ignore);
+        onGround = Physics.CheckSphere(spherePosition, ctrl.radius, 1 << groundLayer, QueryTriggerInteraction.Ignore);
 
         onGround = ctrl.isGrounded;
         animator.SetBool(animIDLand, onGround);
@@ -219,12 +219,6 @@ public class ThirdPersonMovement : MonoBehaviour, IPawnComponent {
         enabled = false;
     }
     public void Active() {
-        //throw new System.NotImplementedException();
-    }
-    
-    public void OnInteract(InputValue value) {
-        if (value.isPressed) {
-            Debug.Log("InteractSound");
-        }
+        enabled = true;
     }
 }
