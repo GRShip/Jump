@@ -7,12 +7,15 @@ public class FootstepEvent : UnityEvent<AnimationEvent> { }
 [System.Serializable]
 public class LandEvent : UnityEvent<AnimationEvent> { }
 
-public class ThirdPersonAnimationEvent : MonoBehaviour, IPawnComponent {
+public class PlayerAnimationEvent : MonoBehaviour, IPawnComponent {
+    public ThirdPersonPawnController Controller { get; private set; }
+    
+    /*
     public delegate void Footstep(AnimationEvent animationEvent);
     Footstep delegateFootstep;
-    
     public delegate void Land(AnimationEvent animationEvent);
     Land delegateLand;
+    */
     
     [SerializeField]
     private FootstepEvent EventFootstep;
@@ -21,6 +24,7 @@ public class ThirdPersonAnimationEvent : MonoBehaviour, IPawnComponent {
     private LandEvent EventLand;
     
     void Start() {
+        Controller = GetComponentInParent<PlayerPawn>().GetController();
         //delegateFootstep += transform.parent.GetComponent<PlayerMovement>().OnFootstep;
         //delegateLand += transform.parent.GetComponent<PlayerMovement>().OnLand;
     }

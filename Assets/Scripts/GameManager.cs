@@ -1,17 +1,15 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;//임시
+using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
-public class ThirdPersonController : MonoBehaviour {
-	public static ThirdPersonController Instance;
+public class GameManager : MonoBehaviour {
+	public static GameManager Instance;
 	
-	public GameObject playerPrefab;
-	private GameObject player;
-	
-	public Transform spawnPosition;
-	
+	public Transform PlayerSpawn { get; private set; }
+
 	[Tooltip("마우스잠금")]
 	public bool cursorLocked = true;
-	
+
 	private void Awake() {
 		if (Instance == null) {
 			Instance = this;
@@ -21,16 +19,17 @@ public class ThirdPersonController : MonoBehaviour {
 			Destroy(gameObject);
 			return;
 		}
+
 		//임시
 		SceneManager.sceneLoaded += SceneLoaded;
-		spawnPosition = gameObject.transform;
+		PlayerSpawn = gameObject.transform;
 	}
 
 	private void OnDestroy() {
 		//임시
 		SceneManager.sceneLoaded -= SceneLoaded;
 	}
-	
+
 	private void OnApplicationFocus(bool hasFocus) {
 		SetCursorState(!cursorLocked);
 	}
@@ -38,44 +37,17 @@ public class ThirdPersonController : MonoBehaviour {
 	private void SetCursorState(bool newState) {
 		Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
 	}
-
+	
 	//임시
 	private void SceneLoaded(Scene scene, LoadSceneMode mode) {
 		if (SceneManager.GetActiveScene().name != "SampleScene") return;
 		SetCursorState(cursorLocked);
-		CreatePlayer();
+		GameStart();
 	}
-	
+
 	public void GameStart() {
-		CreatePlayer();
-	}
-
-	public void CreatePlayer() {
-		LoadPosition();
-		player = Instantiate(playerPrefab, spawnPosition.position, spawnPosition.rotation);
-		if (player == null) {
-			Debug.LogWarning("플레이어 Instantiate 실패");
-			return;
-		}
-		
-		ThirdPersonPawn pawn = player.GetComponent<ThirdPersonPawn>();
-		if (pawn != null) {
-			pawn.Possess(Instance);
-			pawn.OnDestroyed += (destroyedInstance) => {
-				// 파괴된 객체가 currentInstance인 경우에만 새 객체 생성
-				if (destroyedInstance == player) {
-					PlayerDestroyed();
-				}
-			};
-			Camera.main.GetComponent<CameraMovement>().ChangeTarget(pawn.cameraPosition._arm.transform);
-		}
-		else {
-			Debug.LogWarning("생성된 플레이어에 ThirdPersonPawn 컴포넌트가 없음.");
-		}
-	}
-
-	void PlayerDestroyed() {
-		CreatePlayer();
+		PlayerPawnController pc = GameObject.Find("PlayerManager").GetComponent<PlayerPawnController>();
+		pc.CreatePawn();
 	}
 
 	public void SavePosition(Transform tf) {
@@ -90,7 +62,7 @@ public class ThirdPersonController : MonoBehaviour {
 		PlayerPrefs.Save();
 	}
 	
-	public void LoadPosition() {
+	public Transform LoadPosition() {
 		float posx = PlayerPrefs.GetFloat("PlayerPosX", 0);
 		float posy = PlayerPrefs.GetFloat("PlayerPosY", 0);
 		float posz = PlayerPrefs.GetFloat("PlayerPosZ", 0);
@@ -98,9 +70,11 @@ public class ThirdPersonController : MonoBehaviour {
 		float rotx = PlayerPrefs.GetFloat("PlayerRotX", 0);
 		float roty = PlayerPrefs.GetFloat("PlayerRotY", 0);
 		float rotz = PlayerPrefs.GetFloat("PlayerRotZ", 0);
-		
-		spawnPosition.position = new Vector3(posx, posy, posz);
-		spawnPosition.eulerAngles = new Vector3(rotx, roty, rotz);
+
+		Transform tf = transform;
+		tf.position = new Vector3(posx, posy, posz);
+		tf.eulerAngles = new Vector3(rotx, roty, rotz);
+		return tf;
 	}
 	
 	[ContextMenu("ResetPlayerPrefs")]

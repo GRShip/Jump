@@ -2,14 +2,15 @@
 using UnityEngine;
 
 public interface IPawn {
-    public ThirdPersonController PlayerManager { get; set; }
+    public ThirdPersonPawnController PlayerManager { get; }
     public bool HasController { get; }
     
-    public void Possess(ThirdPersonController controller);
+    public void Possess(ThirdPersonPawnController controller);
     public void UnPossess();
 }
 
 public interface IPawnComponent {
+    ThirdPersonPawnController Controller { get; }
     void DeActive();
     void Active();
 }

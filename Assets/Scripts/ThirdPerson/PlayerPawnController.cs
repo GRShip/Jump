@@ -1,8 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(PlayerInput))]
-public class ThirdPersonInput : MonoBehaviour, IPawnComponent {
+public class PlayerPawnController : ThirdPersonPawnController {
+    public static PlayerPawnController Instance;
+    
     [Header("입력")]
     [Tooltip("이동 입력값")]
     public Vector2 moveInput;
@@ -12,6 +14,17 @@ public class ThirdPersonInput : MonoBehaviour, IPawnComponent {
     public bool jumpInput;
     [Tooltip("달리기 입력값")]
     public bool sprintInput;
+    
+    private void Awake() {
+        if (Instance == null) {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else {
+            Destroy(gameObject);
+            return;
+        }
+    }
     
     public void OnMove(InputValue value) {
         MoveInput(value.Get<Vector2>());
@@ -45,10 +58,16 @@ public class ThirdPersonInput : MonoBehaviour, IPawnComponent {
         sprintInput = newSprint;
     }
     
-    public void DeActive() {
-        enabled = false;
+    protected override void AttachPawn(ThirdPersonPawn pawn) {
+        PlayerPawn player = pawn as PlayerPawn;
+        Transform target = player.cameraPosition._arm;
+        Camera.main.GetComponent<CameraMovement>().ChangeTarget(target);
+        Transform tf = GameManager.Instance.LoadPosition();
+        pawn.gameObject.transform.position = tf.position;
+        pawn.gameObject.transform.rotation = tf.rotation;
     }
-    public void Active() {
-        enabled = true;
+
+    protected override void DetachPawn() {
+        CreatePawn();
     }
 }

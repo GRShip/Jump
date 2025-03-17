@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 
 //[ExecuteInEditMode]
-public class ThirdPersonSpringArm : MonoBehaviour {
+public class PlayerSpringArm : MonoBehaviour {
 	public Transform _arm { get; private set; }
 	private Vector3 _armVelocity;
+	private float _armPrevious;
+	private float _armCurrent;
 
 	[Min(0)] public float length = 5.0f;
 	public float smoothTime = 0.5f;
@@ -26,10 +27,16 @@ public class ThirdPersonSpringArm : MonoBehaviour {
 	}
 	
 	private void LateUpdate() {
-		float armLength = GetLength();
-		Vector3 armPosition = Vector3.back * armLength;
-		
-		_arm.localPosition = Vector3.SmoothDamp(_arm.localPosition, armPosition, ref _armVelocity, smoothTime);
+		_armPrevious = _armCurrent;
+		_armCurrent = GetLength();
+		Vector3 armPosition = Vector3.back * _armCurrent;
+
+		if (_armPrevious <= _armCurrent) {
+			_arm.localPosition = Vector3.SmoothDamp(_arm.localPosition, armPosition, ref _armVelocity, smoothTime);
+		}
+		else {
+			_arm.localPosition = armPosition;
+		}
 	}
 
 	public void OnWheel(InputValue input) {
@@ -44,9 +51,9 @@ public class ThirdPersonSpringArm : MonoBehaviour {
 	private float GetLength() {
 		Ray ray = new Ray(transform.position, -transform.forward);
 		RaycastHit hit;
-
+		
 		//구 캐스트
-		if (Physics.SphereCast(ray, Mathf.Max(0.01f, radius), out hit, length, collisionLayer)) {
+		if (Physics.SphereCast(ray, Mathf.Max(0.01f, radius), out hit, length, 1 << collisionLayer)) {
 			return hit.distance;
 		}
 		return length;

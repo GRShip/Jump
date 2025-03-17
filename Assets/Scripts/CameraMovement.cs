@@ -1,16 +1,14 @@
-using System;
 using UnityEngine;
 
 public class CameraMovement : MonoBehaviour {
     public Transform target;
 
     private bool posFlag = false;
-    private Vector3 posVelocity = Vector3.zero;
-    [Tooltip("오프셋")] public Vector3 posOffset;
-    [Range(0f, 1f), Tooltip("위치 보간 시간")] public float posSmoothTime = 0.1f;
-
     private bool rotFlag = false;
-    [Range(0f, 1f), Tooltip("회전 보간 속도")] public float rotSmoothSpeed = 1f;
+    [Tooltip("오프셋")]
+    public Vector3 posOffset;
+    [Range(1f, 100f), Tooltip("보간 속도")]
+    public float smoothSpeed = 20f;
     
     private void LateUpdate() {
         if (target == null) {
@@ -29,12 +27,24 @@ public class CameraMovement : MonoBehaviour {
             return;
         }
 
-        if (Vector3.Distance(transform.position, targetPosition) > 0.1f) {
-            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref posVelocity, posSmoothTime);
+        if (Vector3.Distance(transform.position, targetPosition) > 0.01f) {
+            //transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref posVelocity, posSmoothTime);
+            transform.position = ExponentialLerp(transform.position, targetPosition, smoothSpeed);
             return;
         }
         
         posFlag = true;
+    }
+
+    Vector3 ExponentialLerp(Vector3 current, Vector3 target, float damping) {
+        float t = 1 - Mathf.Exp(-damping * Time.deltaTime);
+        return Vector3.Lerp(current, target, t);
+    }
+
+    Quaternion ExponentialSlerp(Quaternion current, Quaternion target, float damping) {
+        // Time.deltaTime을 이용해 프레임 독립적인 t 값을 계산합니다.
+        float t = 1 - Mathf.Exp(-damping * Time.deltaTime);
+        return Quaternion.Slerp(current, target, t);
     }
 
     private void UpdateRotation() {
@@ -44,7 +54,8 @@ public class CameraMovement : MonoBehaviour {
         }
 
         if (Quaternion.Angle(transform.rotation, target.rotation) > 1f) {
-            transform.rotation = Quaternion.Slerp(transform.rotation, target.rotation, Time.deltaTime * rotSmoothSpeed);
+            //transform.rotation = Quaternion.Slerp(transform.rotation, target.rotation, Time.deltaTime * rotSmoothSpeed);
+            transform.rotation = ExponentialSlerp(transform.rotation, target.rotation, smoothSpeed);
             return;
         }
 
@@ -53,7 +64,6 @@ public class CameraMovement : MonoBehaviour {
 
     public void ChangeTarget(Transform next) {
         target = next;
-        posVelocity = Vector3.zero;
         posFlag = false;
         rotFlag = false;
     }

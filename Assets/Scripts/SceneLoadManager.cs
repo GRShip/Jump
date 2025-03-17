@@ -5,8 +5,8 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SceneLoader : MonoBehaviour {
-    public static SceneLoader Instance;
+public class SceneLoadManager : MonoBehaviour {
+    public static SceneLoadManager Instance;
     
     private string sceneName = string.Empty;
     private bool sceneChange = false;
@@ -36,10 +36,15 @@ public class SceneLoader : MonoBehaviour {
         LoadSceneAsync("TitleScene");
 #endif
     }
+    
+    private void SceneLoaded(Scene scene, LoadSceneMode mode) {
+        if (SceneManager.GetActiveScene().name != "LoadingScene") return;
+        StartCoroutine(WaitSeconds(1f));
+    }
 
-    public void SetTargetScene(string sceneName) {
+    public void SetNextScene(string nextSceneName) {
         if (sceneChange == false) {
-            this.sceneName = sceneName;
+            sceneName = nextSceneName;
         }
         else {
             Debug.LogWarning("Not allowed while doing LoadSceneAsync");
@@ -55,11 +60,6 @@ public class SceneLoader : MonoBehaviour {
         this.sceneName = sceneName;
         sceneChange = true;
         SceneManager.LoadScene("LoadingScene");
-    }
-    
-    private void SceneLoaded(Scene scene, LoadSceneMode mode) {
-        if (SceneManager.GetActiveScene().name != "LoadingScene") return;
-        StartCoroutine(WaitSeconds(1f));
     }
     
     private IEnumerator WaitSeconds(float sec) {

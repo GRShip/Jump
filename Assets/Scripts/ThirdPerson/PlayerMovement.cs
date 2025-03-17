@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 
 [RequireComponent(typeof(CharacterController))]
-public class ThirdPersonMovement : MonoBehaviour, IPawnComponent {
-    private CharacterController ctrl;
-    private Animator animator;
-    private ThirdPersonInput input;
+[RequireComponent(typeof(ThirdPersonPawn))]
+public class PlayerMovement : MonoBehaviour, IPawnComponent {
+    private CharacterController cc;
+    private Animator ani;
+    public ThirdPersonPawnController Controller { get; private set; }
+    private PlayerPawnController PlayerController { get; set; }
     
     [Header("플레이어")]
     [Tooltip("걷기속도")]
@@ -25,8 +25,6 @@ public class ThirdPersonMovement : MonoBehaviour, IPawnComponent {
     public float jumpPower = 2f;
     [Tooltip("최대 점프 횟수"), Min(1)]
     public int jumpCountMax = 1;
-    [FormerlySerializedAs("_jumpCount")]
-    [SerializeField]
     private int jumpCount = 0;
     [Tooltip("점프 유지시간"), Range(0, 0.5f)]
     public float jumpHoldTime = 0.25f;
@@ -69,18 +67,20 @@ public class ThirdPersonMovement : MonoBehaviour, IPawnComponent {
     private int animIDFall;
     
     private void Awake() {
-        ctrl = GetComponent<CharacterController>();
-        animator = GetComponentInChildren<Animator>();
-        input = GetComponent<ThirdPersonInput>();
+        cc = GetComponent<CharacterController>();
+        ani = GetComponentInChildren<Animator>();
     }
 
     private void Start() {
+        Controller = GetComponent<PlayerPawn>().GetController();
+        PlayerController = Controller as PlayerPawnController;
+        
         AssignAnimation();
     }
 
     private void Update() {
         //if (TryGetComponent(out _ctrl) == false) {
-        if (ctrl.enabled == false) {
+        if (cc.enabled == false) {
             return;
         }
 
@@ -89,7 +89,7 @@ public class ThirdPersonMovement : MonoBehaviour, IPawnComponent {
         Move();
         CameraRotation();
     }
-    
+
     private void AssignAnimation() {
         animIDSpeed = Animator.StringToHash("Speed");
         animIDLand = Animator.StringToHash("Land");
@@ -99,8 +99,8 @@ public class ThirdPersonMovement : MonoBehaviour, IPawnComponent {
     
     private void Gravity() {
         if (onGround == true) {
-            animator.SetBool(animIDJump, false);
-            animator.SetBool(animIDFall, false);
+            ani.SetBool(animIDJump, false);
+            ani.SetBool(animIDFall, false);
             
             fallTime = FallDelay;
             
@@ -116,17 +116,17 @@ public class ThirdPersonMovement : MonoBehaviour, IPawnComponent {
                 fallTime -= Time.deltaTime;
             }
             else {
-                animator.SetBool(animIDFall, true);
+                ani.SetBool(animIDFall, true);
             }
         }
         
-        if (input.jumpInput == true) {
+        if (PlayerController && PlayerController.jumpInput == true) {
             if (jumpCount < jumpCountMax) {
                 if (jumpHoldFlag == false) {
                     jumpCount += 1;
                     jumpHold = 0;
                     jumpHoldFlag = true;
-                    animator.SetBool(animIDJump, true);
+                    ani.SetBool(animIDJump, true);
                 }
             }
         }
@@ -148,18 +148,19 @@ public class ThirdPersonMovement : MonoBehaviour, IPawnComponent {
     }
 
     private void GroundedCheck() {
-        Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - groundOffset, transform.position.z);
-        onGround = Physics.CheckSphere(spherePosition, ctrl.radius, 1 << groundLayer, QueryTriggerInteraction.Ignore);
-
-        onGround = ctrl.isGrounded;
-        animator.SetBool(animIDLand, onGround);
+        //Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - groundOffset, transform.position.z);
+        //onGround = Physics.CheckSphere(spherePosition, cc.radius, 1 << groundLayer, QueryTriggerInteraction.Ignore);
+        onGround = cc.isGrounded;
+        ani.SetBool(animIDLand, onGround);
     }
     
     private void CameraRotation() {
-        if (input.lookInput.sqrMagnitude >= 0.01f) {
+        if (!PlayerController) { return; }
+        
+        if (PlayerController.lookInput.sqrMagnitude >= 0.01f) {
             //마우스 이동
-            forwardYaw += input.lookInput.x * Time.deltaTime * forwardRotationRate;
-            forwardPitch += -input.lookInput.y * Time.deltaTime * forwardRotationRate;
+            forwardYaw += PlayerController.lookInput.x * Time.deltaTime * forwardRotationRate;
+            forwardPitch += -PlayerController.lookInput.y * Time.deltaTime * forwardRotationRate;
         }
         
         //오버플로방지
@@ -171,36 +172,46 @@ public class ThirdPersonMovement : MonoBehaviour, IPawnComponent {
     }
 
     private void Move() {
-        //목표 속도
-        float targetSpeed = input.sprintInput ? sprintSpeed : moveSpeed;
-        if (input.moveInput == Vector2.zero) {
-            targetSpeed = 0.0f;
+        if (!cc) {
+            return;
         }
-        
-        //현재 속도
-        float currentSpeed = new Vector3(ctrl.velocity.x, 0.0f, ctrl.velocity.z).magnitude;
-        if (Mathf.Abs(currentSpeed - targetSpeed) < 0.1f) {
-            hspeed = targetSpeed;
-        } else {
-            hspeed = Mathf.Lerp(currentSpeed, targetSpeed, Time.deltaTime * speedChangeRate);
+
+        if (PlayerController) {
+            //목표 속도
+            float targetSpeed = PlayerController.sprintInput ? sprintSpeed : moveSpeed;
+            if (PlayerController.moveInput == Vector2.zero) {
+                targetSpeed = 0.0f;
+            }
+
+            //현재 속도
+            float currentSpeed = new Vector3(cc.velocity.x, 0.0f, cc.velocity.z).magnitude;
+            if (Mathf.Abs(currentSpeed - targetSpeed) < 0.1f) {
+                hspeed = targetSpeed;
+            }
+            else {
+                hspeed = Mathf.Lerp(currentSpeed, targetSpeed, Time.deltaTime * speedChangeRate);
+            }
+
+            Vector3 inputDirection = new Vector3(PlayerController.moveInput.x, 0.0f, PlayerController.moveInput.y)
+                .normalized;
+            //입력 방향
+            if (PlayerController.moveInput != Vector2.zero) {
+                targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
+                                 forwardPosition.transform.eulerAngles.y;
+
+                float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref rotationVelocity,
+                    rotationSmoothTime);
+
+                transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+            }
         }
-        
-        Vector3 inputDirection = new Vector3(input.moveInput.x, 0.0f, input.moveInput.y).normalized;
-        //입력 방향
-        if (input.moveInput != Vector2.zero) {
-            targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + forwardPosition.transform.eulerAngles.y;
-            
-            float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref rotationVelocity, rotationSmoothTime);
-            
-            transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
-        }
-        
+
         //이동
         Vector3 targetDirection = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
-        ctrl.Move((targetDirection.normalized * hspeed + new Vector3(0.0f, vspeed, 0.0f)) * Time.deltaTime);
+        cc.Move((targetDirection.normalized * hspeed + new Vector3(0.0f, vspeed, 0.0f)) * Time.deltaTime);
         
         //애니메이터
-        animator.SetFloat(animIDSpeed, hspeed);
+        ani.SetFloat(animIDSpeed, hspeed);
     }
     
     

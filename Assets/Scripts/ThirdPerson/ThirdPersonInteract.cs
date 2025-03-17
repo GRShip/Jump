@@ -1,15 +1,15 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(ThirdPersonPawn))]
 public class ThirdPersonInteract : MonoBehaviour, IPawnComponent {
-    
-    private ThirdPersonInput input;
+    public ThirdPersonPawnController Controller { get; private set; }
     
     [Min(0)] public float length = 5.0f;
     public LayerMask collisionLayer = -1;
 
     private void Awake() {
-        input = GetComponent<ThirdPersonInput>();
+        Controller = GetComponent<ThirdPersonPawn>().GetController();
     }
     
     private void Raycasting() {
