@@ -10,11 +10,10 @@ public class Bear : MonoBehaviour
     public float attPushtime = 1.5f;
 
     float currentTime = 0;
-    float attackDelay = 1f;
+    float attackDelay = 3f;
 
     Vector3 originPos;
     Quaternion originRot;
-    CharacterController cc;
     NavMeshAgent agent;
     Animator anim;
 
@@ -32,7 +31,6 @@ public class Bear : MonoBehaviour
     void Start()
     {
         stat = State.Idle;
-        cc = GetComponent<CharacterController>();
         agent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
         originPos = transform.position;
