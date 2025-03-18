@@ -8,7 +8,7 @@ public class ThirdPersonInteract : MonoBehaviour, IPawnComponent {
     [Min(0)] public float length = 5.0f;
     public LayerMask collisionLayer = -1;
 
-    private void Awake() {
+    private void Start() {
         Controller = GetComponent<ThirdPersonPawn>().GetController();
     }
     

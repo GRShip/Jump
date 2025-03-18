@@ -19,6 +19,7 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
     [Range(0.0f, 0.3f)]
     public float rotationSmoothTime = 0.15f;
     private float hspeed = 0f;
+    private float rotationVelocity = 0f;
     
     [Space(5)]
     [Tooltip("점프 세기")]
@@ -59,7 +60,7 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
     private float forwardYaw = 0f;
     private float forwardPitch = 0f;
     private float targetRotation = 0f;
-    private float rotationVelocity = 0f;
+    
 
     private int animIDSpeed;
     private int animIDLand;
@@ -68,10 +69,10 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
     
     private void Awake() {
         cc = GetComponent<CharacterController>();
-        ani = GetComponentInChildren<Animator>();
     }
 
     private void Start() {
+        ani = GetComponentInChildren<Animator>();
         Controller = GetComponent<PlayerPawn>().GetController();
         PlayerController = Controller as PlayerPawnController;
         
@@ -84,10 +85,14 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
             return;
         }
 
+        if ((!PlayerController) || (PlayerController.canInput == false)) {
+            return;
+        }
+
         GroundedCheck();
         Gravity();
         Move();
-        CameraRotation();
+        //CameraRotation();
     }
 
     private void AssignAnimation() {
@@ -175,7 +180,7 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
         if (!cc) {
             return;
         }
-
+        
         if (PlayerController) {
             //목표 속도
             float targetSpeed = PlayerController.sprintInput ? sprintSpeed : moveSpeed;
@@ -191,7 +196,6 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
             else {
                 hspeed = Mathf.Lerp(currentSpeed, targetSpeed, Time.deltaTime * speedChangeRate);
             }
-
             Vector3 inputDirection = new Vector3(PlayerController.moveInput.x, 0.0f, PlayerController.moveInput.y)
                 .normalized;
             //입력 방향
@@ -205,16 +209,13 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
                 transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
             }
         }
-
         //이동
         Vector3 targetDirection = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
-        cc.Move((targetDirection.normalized * hspeed + new Vector3(0.0f, vspeed, 0.0f)) * Time.deltaTime);
-        
+        Vector3 final = (targetDirection.normalized * hspeed + new Vector3(0.0f, vspeed, 0.0f)) * Time.deltaTime;
+        cc.Move(final);
         //애니메이터
         ani.SetFloat(animIDSpeed, hspeed);
     }
-    
-    
     
     public void OnFootstep(AnimationEvent animationEvent) {
         //if (animationEvent.animatorClipInfo.weight > 0.5f) {

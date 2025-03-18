@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 public class GameManager : MonoBehaviour {
 	public static GameManager Instance;
+
+	[SerializeField]
+	private int saveIndex = 0;
 	
 	public Transform PlayerSpawn { get; private set; }
 
@@ -34,6 +36,10 @@ public class GameManager : MonoBehaviour {
 		SetCursorState(!cursorLocked);
 	}
 
+	public int GetSaveIndex() {
+		return saveIndex;
+	}
+	
 	private void SetCursorState(bool newState) {
 		Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
 	}
@@ -48,9 +54,11 @@ public class GameManager : MonoBehaviour {
 	public void GameStart() {
 		PlayerPawnController pc = GameObject.Find("PlayerManager").GetComponent<PlayerPawnController>();
 		pc.CreatePawn();
+		Debug.Log(pc.GetPawn().transform.position.ToString());
 	}
 
-	public void SavePosition(Transform tf) {
+	public void SavePosition(Transform tf, int index) {
+		PlayerPrefs.SetFloat("SaveIndex", saveIndex);
 		PlayerPrefs.SetFloat("PlayerPosX", tf.position.x);
 		PlayerPrefs.SetFloat("PlayerPosY", tf.position.y);
 		PlayerPrefs.SetFloat("PlayerPosZ", tf.position.z);
@@ -60,9 +68,11 @@ public class GameManager : MonoBehaviour {
 		PlayerPrefs.SetFloat("PlayerRotZ", tf.eulerAngles.z);
 
 		PlayerPrefs.Save();
+		saveIndex = index;
 	}
 	
 	public Transform LoadPosition() {
+		saveIndex = PlayerPrefs.GetInt("SaveIndex", 0);
 		float posx = PlayerPrefs.GetFloat("PlayerPosX", 0);
 		float posy = PlayerPrefs.GetFloat("PlayerPosY", 0);
 		float posz = PlayerPrefs.GetFloat("PlayerPosZ", 0);

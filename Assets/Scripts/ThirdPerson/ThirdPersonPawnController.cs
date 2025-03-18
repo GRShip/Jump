@@ -7,6 +7,10 @@ public class ThirdPersonPawnController : MonoBehaviour {
 	public void CreatePawn() {
 		AttachToPawn(pawnPrefab);
 	}
+
+	public GameObject GetPawn() {
+		return PawnInstance;
+	}
 	
 	private void AttachToPawn(GameObject instance) {
 		PawnInstance = Instantiate(instance);

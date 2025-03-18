@@ -2,9 +2,9 @@ using System;
 using UnityEngine;
 
 public class ThirdPersonPawn : MonoBehaviour {
-    public ThirdPersonPawnController controller;
+    protected ThirdPersonPawnController controller;
     public Action<GameObject> ControllerUnposses;
-    IPawnComponent[] pawnComponents;
+    private IPawnComponent[] pawnComponents;
     
     public ThirdPersonPawnController GetController() {
         return controller;
@@ -24,11 +24,11 @@ public class ThirdPersonPawn : MonoBehaviour {
     }
 
     public void UnPossessController() {
+        UnPossess();
         controller = null;
         if (ControllerUnposses != null) {
             ControllerUnposses(gameObject);
         }
-        UnPossess();
     }
 
     protected virtual void Possess(ThirdPersonPawnController ctrl) {}

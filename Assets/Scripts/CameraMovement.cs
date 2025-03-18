@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public class CameraMovement : MonoBehaviour {
-    public Transform target;
+    public GameObject attach;
 
     private bool posFlag = false;
     private bool rotFlag = false;
@@ -10,17 +10,33 @@ public class CameraMovement : MonoBehaviour {
     [Range(1f, 100f), Tooltip("보간 속도")]
     public float smoothSpeed = 20f;
     
+    [Tooltip("상승최대각도")]
+    public float forwardPitchTop = 60.0f;
+    [Tooltip("하강최대각도")]
+    public float forwardPitchBottom = -60.0f;
+    [Tooltip("회전감도")]
+    public float forwardRotationRate = 10f;
+    private float forwardYaw = 0f;
+    private float forwardPitch = 0f;
+    
+    private PlayerPawnController PlayerController { get; set; }
+
+    private void Start() {
+        PlayerController = GameObject.Find("PlayerManager").GetComponent<PlayerPawnController>();
+    }
+
     private void LateUpdate() {
-        if (target == null) {
+        if (!attach) {
             return;
         }
 
         UpdatePosition();
-        UpdateRotation();
+        //UpdateRotation();
+        CameraRotation();
     }
 
     private void UpdatePosition() {
-        Vector3 targetPosition = target.position + posOffset;
+        Vector3 targetPosition = attach.transform.position + posOffset;
 
         if (posFlag == true) {
             transform.position = targetPosition;
@@ -35,7 +51,22 @@ public class CameraMovement : MonoBehaviour {
         
         posFlag = true;
     }
+    
+    private void UpdateRotation() {
+        if (rotFlag == true) {
+            transform.rotation = attach.transform.rotation;
+            return;
+        }
 
+        if (Quaternion.Angle(transform.rotation, attach.transform.rotation) > 1f) {
+            //transform.rotation = Quaternion.Slerp(transform.rotation, target.rotation, Time.deltaTime * rotSmoothSpeed);
+            transform.rotation = ExponentialSlerp(transform.rotation, attach.transform.rotation, smoothSpeed);
+            return;
+        }
+
+        rotFlag = true;
+    }
+    
     Vector3 ExponentialLerp(Vector3 current, Vector3 target, float damping) {
         float t = 1 - Mathf.Exp(-damping * Time.deltaTime);
         return Vector3.Lerp(current, target, t);
@@ -47,24 +78,28 @@ public class CameraMovement : MonoBehaviour {
         return Quaternion.Slerp(current, target, t);
     }
 
-    private void UpdateRotation() {
-        if (rotFlag == true) {
-            transform.rotation = target.rotation;
-            return;
-        }
-
-        if (Quaternion.Angle(transform.rotation, target.rotation) > 1f) {
-            //transform.rotation = Quaternion.Slerp(transform.rotation, target.rotation, Time.deltaTime * rotSmoothSpeed);
-            transform.rotation = ExponentialSlerp(transform.rotation, target.rotation, smoothSpeed);
-            return;
-        }
-
-        rotFlag = true;
-    }
-
-    public void ChangeTarget(Transform next) {
-        target = next;
+    public void ChangeTarget(GameObject next) {
+        attach = next;
         posFlag = false;
         rotFlag = false;
+    }
+    
+    private void CameraRotation() {
+        if (PlayerController.lookInput.sqrMagnitude >= 0.01f) {
+            //마우스 이동
+            forwardYaw += PlayerController.lookInput.x * Time.deltaTime * forwardRotationRate;
+            forwardPitch += -PlayerController.lookInput.y * Time.deltaTime * forwardRotationRate;
+        }
+        
+        //오버플로방지
+        forwardYaw = Mathf.Clamp(forwardYaw, float.MinValue, float.MaxValue);
+        forwardPitch = Mathf.Clamp(forwardPitch, forwardPitchBottom, forwardPitchTop);
+        
+        //회전
+        transform.rotation = Quaternion.Euler(forwardPitch, forwardYaw, 0.0f);
+
+        if (attach) {
+            attach.transform.rotation = transform.rotation;
+        }
     }
 }

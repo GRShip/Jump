@@ -1,9 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(PlayerInput))]
 public class PlayerPawnController : ThirdPersonPawnController {
     public static PlayerPawnController Instance;
+    
+    public bool canInput = false;
     
     [Header("입력")]
     [Tooltip("이동 입력값")]
@@ -57,17 +60,29 @@ public class PlayerPawnController : ThirdPersonPawnController {
     public void SprintInput(bool newSprint) {
         sprintInput = newSprint;
     }
-    
+
     protected override void AttachPawn(ThirdPersonPawn pawn) {
         PlayerPawn player = pawn as PlayerPawn;
-        Transform target = player.cameraPosition._arm;
-        Camera.main.GetComponent<CameraMovement>().ChangeTarget(target);
-        Transform tf = GameManager.Instance.LoadPosition();
-        pawn.gameObject.transform.position = tf.position;
-        pawn.gameObject.transform.rotation = tf.rotation;
+        if (player) {
+            Camera.main.transform.parent.GetComponent<CameraMovement>().ChangeTarget(player.cameraPosition);
+
+            Transform tf = GameManager.Instance.LoadPosition();
+            pawn.gameObject.transform.position = tf.position;
+            pawn.gameObject.transform.rotation = tf.rotation;
+            Physics.SyncTransforms();
+            canInput = true;
+        }
     }
 
     protected override void DetachPawn() {
+        canInput = false;
+        if (this != null) {
+            StartCoroutine(CreateDelay(3f));
+        }
+    }
+
+    IEnumerator CreateDelay(float delay) {
+        yield return new WaitForSeconds(delay);
         CreatePawn();
     }
 }

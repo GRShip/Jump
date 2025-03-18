@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 3
   tags:
   - SavePoint
+  - OutofBound
+  - DeathArea
   layers:
   - Default
   - TransparentFX
@@ -17,7 +19,7 @@ TagManager:
   - Player
   - Ragdoll
   - Enemy
-  - 
+  - Box
   - 
   - 
   - 
