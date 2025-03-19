@@ -1,13 +1,23 @@
 ﻿using System.Collections;
 using UnityEngine;
 
+public enum PlayerState {
+    Walking,
+    Ragdoll,
+    Standup,
+    ResettingBones
+}
+
 public class PlayerPawn : ThirdPersonPawn {
+    public PlayerPawnController PlayerController { get; private set; }
     private PlayerRagdoll ragdoll;
     private Animator ani;
     public GameObject cameraPosition;
     
     private int animIDStandFront;
     private int animIDStandBack;
+    
+    private PlayerState playerState = PlayerState.Walking;
     
     protected override void Awake() {
         base.Awake();
@@ -26,8 +36,8 @@ public class PlayerPawn : ThirdPersonPawn {
         ani.SetBool(animIDStandFront, false);
         ani.SetBool(animIDStandBack, false);
         //Debug
-        if (Input.GetMouseButtonDown(1) && controller) {
-            PlayerDamaged(Vector3.back * 100, 5f);
+        if (Input.GetMouseButtonDown(1) && PlayerController.canInput) {
+            PlayerDamaged(Vector3.back * 10, 5f);
             //PlayerDestroy();
         }
         
@@ -45,11 +55,12 @@ public class PlayerPawn : ThirdPersonPawn {
 
     protected override void Possess(ThirdPersonPawnController ctrl) {
         controller = ctrl;
-        ((PlayerPawnController)controller).canInput = true;
+        PlayerController = controller as PlayerPawnController;
+        PlayerController.canInput = true;
     }
 
     protected override void UnPossess() {
-        ((PlayerPawnController)controller).canInput = false;
+        PlayerController.canInput = false;
         ChangePawnActivity(false);
     }
     
@@ -66,10 +77,13 @@ public class PlayerPawn : ThirdPersonPawn {
 
     public IEnumerator DoRagdoll(Vector3 force, float time) {
         yield return new WaitForFixedUpdate();
+        
         Rigidbody rb = ragdoll.hip.GetComponent<Rigidbody>();
         rb.AddForce(force, ForceMode.VelocityChange);
-        
+        Camera.main.transform.parent.GetComponent<CameraMovement>().ChangeTarget(cameraPosition);
         yield return new WaitForSeconds(time);
+        
+        Camera.main.transform.parent.GetComponent<CameraMovement>().ChangeTarget(cameraPosition);
         Ray ray = new Ray(ragdoll.GetRagdollRoot().transform.position, Vector3.down);
         RaycastHit hit;
         if (Physics.SphereCast(ray, 0.25f, out hit, 2f, LayerMask.NameToLayer("Terrain"))) {
@@ -78,7 +92,7 @@ public class PlayerPawn : ThirdPersonPawn {
         else {
             transform.position = ragdoll.GetRagdollRoot().transform.position;
         }
-        
+
         Vector3 hipUp = -ragdoll.hip.transform.right;
         hipUp.y = 0f;
         if (hipUp.sqrMagnitude > 0.001f) {
@@ -86,27 +100,20 @@ public class PlayerPawn : ThirdPersonPawn {
             Quaternion targetRotation = Quaternion.LookRotation(hipUp);
             transform.rotation = targetRotation;
         }
-        Vector3 hipForward = ragdoll.hip.transform.forward;
-        hipForward.y = 0f;
-        if (hipForward.sqrMagnitude > 0.001f) {
-            hipForward.Normalize();
-
-            bool isFacingUp = Vector3.Dot(hipForward, Vector3.forward) > 0;
-            Debug.Log("A instance는 xz 평면 상에서 " + (isFacingUp ? "위" : "아래") + "를 바라봅니다.");
-            if (isFacingUp == true) {
-                ani.SetBool(animIDStandFront, true);
-            }
-            else {
-                ani.SetBool(animIDStandBack, true);
-            }
+        
+        bool hipForward = ragdoll.hip.transform.forward.y > 0;
+        Debug.Log("hipForward "+(hipForward ? "위" : "아래"));
+        if (hipForward == true) {
+            ani.SetBool(animIDStandFront, true);
+            transform.Rotate(0, 180, 0);
         }
         else {
             ani.SetBool(animIDStandBack, true);
         }
-        
+
         ChangePawnActivity(true);
         yield return new WaitForSeconds(5f);
-        ((PlayerPawnController)controller).canInput = true;
+        PlayerController.canInput = true;
     }
     
     public void OnTriggerEnter(Collider other) {

@@ -85,10 +85,6 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
             return;
         }
 
-        if ((!PlayerController) || (PlayerController.canInput == false)) {
-            return;
-        }
-
         GroundedCheck();
         Gravity();
         Move();
@@ -180,11 +176,11 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
         if (!cc) {
             return;
         }
-        
+
         if (PlayerController) {
             //목표 속도
             float targetSpeed = PlayerController.sprintInput ? sprintSpeed : moveSpeed;
-            if (PlayerController.moveInput == Vector2.zero) {
+            if ((PlayerController.canInput == false) || (PlayerController.moveInput == Vector2.zero)) {
                 targetSpeed = 0.0f;
             }
 
@@ -196,23 +192,30 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
             else {
                 hspeed = Mathf.Lerp(currentSpeed, targetSpeed, Time.deltaTime * speedChangeRate);
             }
-            Vector3 inputDirection = new Vector3(PlayerController.moveInput.x, 0.0f, PlayerController.moveInput.y)
-                .normalized;
-            //입력 방향
-            if (PlayerController.moveInput != Vector2.zero) {
-                targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
-                                 forwardPosition.transform.eulerAngles.y;
 
-                float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref rotationVelocity,
-                    rotationSmoothTime);
+            Vector3 inputDirection = new Vector3(PlayerController.moveInput.x, 0.0f, PlayerController.moveInput.y) .normalized;
+            if (PlayerController.canInput == false) {
+                inputDirection = Vector3.zero;
+            }
+            else {
+                //입력 방향
+                if (PlayerController.moveInput != Vector2.zero) {
+                    targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
+                                     forwardPosition.transform.eulerAngles.y;
 
-                transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                    float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation,
+                        ref rotationVelocity, rotationSmoothTime);
+
+                    transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                }
             }
         }
+
         //이동
         Vector3 targetDirection = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
         Vector3 final = (targetDirection.normalized * hspeed + new Vector3(0.0f, vspeed, 0.0f)) * Time.deltaTime;
         cc.Move(final);
+        
         //애니메이터
         ani.SetFloat(animIDSpeed, hspeed);
     }
