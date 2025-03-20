@@ -6,7 +6,7 @@ public class Bear : MonoBehaviour
     public GameObject player;
     public float sight = 12f;
     public float range = 2.7f;
-    public float pushtime = 0.5f;
+    public float pushtime = 0.2f;
     public float attPushtime = 1.5f;
 
     float currentTime = 0;
