@@ -1,7 +1,6 @@
-using System;
 using UnityEngine;
 
-public class Testscr : MonoBehaviour {
+public class PawnOnTrigger : MonoBehaviour {
     private Rigidbody rb;
     private void Awake() {
         rb = GetComponent<Rigidbody>();
