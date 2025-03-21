@@ -3,13 +3,12 @@
 public interface IPawn {
     public ThirdPersonPawnController PlayerManager { get; }
     public bool HasController { get; }
-    
     public void Possess(ThirdPersonPawnController controller);
     public void UnPossess();
 }
 
 public interface IPawnComponent {
-    ThirdPersonPawnController Controller { get; }
+    ThirdPersonPawn Owner { get; }
     void DeActive();
     void Active();
 }
@@ -22,6 +21,5 @@ public class BoneTransform {
 public enum PlayerState {
     Idle,
     Ragdoll,
-    LerpBones,
     Standup
 }

@@ -30,10 +30,12 @@ public class PlayerTest : MonoBehaviour {
     
     private void Awake() {
         rbs = GetComponentsInChildren<Rigidbody>();
-        ani = GetComponent<Animator>();
-        cc = GetComponent<CharacterController>();
+        cc = GetComponentInParent<CharacterController>();
+        ani = GetComponentInParent<Animator>();
+    }
+
+    private void Start() {
         hipsBone = ani.GetBoneTransform(HumanBodyBones.Hips);
-        
         bones = hipsBone.GetComponentsInChildren<Transform>();
         standBones = new BoneTransform[bones.Length];
         standBackBones = new BoneTransform[bones.Length];
@@ -61,7 +63,7 @@ public class PlayerTest : MonoBehaviour {
             case PlayerState.Standup:
                 StandingBehaviour();
                 break;
-            case PlayerState.LerpBones:
+            //case PlayerState.LerpBones:
                 ResetBehaviour();
                 break;
         }
@@ -127,7 +129,7 @@ public class PlayerTest : MonoBehaviour {
             AlignPositionToHips();
             
             PopulateBoneTransforms(ragdollBones);
-            state = PlayerState.LerpBones;
+            //state = PlayerState.LerpBones;
             timeResetTimer = 0f;
         }
     }

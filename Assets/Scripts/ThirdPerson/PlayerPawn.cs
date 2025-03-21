@@ -1,112 +1,75 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerPawn : ThirdPersonPawn {
+    private PawnRagdoll ragdoll;
+    private PlayerMovement movement;
     public PlayerPawnController PlayerController { get; private set; }
-    private PlayerRagdoll ragdoll;
-    private Animator ani;
     public GameObject cameraPosition;
     
-    private int animIDStandFront;
-    private int animIDStandBack;
-    
     private PlayerState playerState = PlayerState.Idle;
+    
+    private Vector3 cameraPositionOffset;
     
     protected override void Awake() {
         base.Awake();
         
-        ani = GetComponentInChildren<Animator>();
-        animIDStandFront = Animator.StringToHash("StandFront");
-        animIDStandBack = Animator.StringToHash("StandBack");
+        movement = GetComponent<PlayerMovement>();
+        ragdoll = transform.Find("Mannequin").GetComponent<PawnRagdoll>();
+        cameraPositionOffset = cameraPosition.transform.localPosition;
     }
-
-    protected override void Start() {
-        base.Start();
-        ragdoll = transform.Find("Mannequin").GetComponent<PlayerRagdoll>();
-    }
-
+    
     private void Update() {
-        ani.SetBool(animIDStandFront, false);
-        ani.SetBool(animIDStandBack, false);
         //Debug
-        if (Input.GetMouseButtonDown(1) && PlayerController.canInput) {
-            PlayerDamaged(Vector3.back * 10, 5f);
+        if (Input.GetMouseButtonDown(1) && movement.canInput == true) {
+            PlayerRagdollStart(Vector3.forward * 200);
             //PlayerDestroy();
         }
-        
-        if (ragdoll.Activity == true) {
-            cameraPosition.transform.position = ragdoll.hip.transform.position + new Vector3(0, 1.1f, 0);
-        }
-        else {
-            cameraPosition.transform.localPosition = new Vector3(0, 2, 0);
-        }
     }
-
+    
     private void OnDestroy() {
-        UnPossessController();
+        if (controller) {
+            controller.DetachFromPawn();
+        }
     }
 
-    protected override void Possess(ThirdPersonPawnController ctrl) {
+    public override void Possess(ThirdPersonPawnController ctrl) {
         controller = ctrl;
-        PlayerController = controller as PlayerPawnController;
-        PlayerController.canInput = true;
+        PlayerController = ctrl as PlayerPawnController;
+        movement.canInput = true;
     }
 
-    protected override void UnPossess() {
-        PlayerController.canInput = false;
-        ChangePawnActivity(false);
+    public override void UnPossess() {
+        movement.canInput = false;
+        PawnComponentsActivity(false);
     }
     
     public void PlayerDestroy() {
-        UnPossessController();
-    }
-    
-    public void PlayerDamaged(Vector3 force, float time) {
-        UnPossess();
-        
-        StopAllCoroutines();
-        StartCoroutine(DoRagdoll(force, time));
+        if (controller) {
+            controller.DetachFromPawn();
+        }
     }
 
-    public IEnumerator DoRagdoll(Vector3 force, float time) {
-        yield return new WaitForFixedUpdate();
-        
-        Rigidbody rb = ragdoll.hip.GetComponent<Rigidbody>();
-        rb.AddForce(force, ForceMode.VelocityChange);
-        Camera.main.transform.parent.GetComponent<CameraMovement>().ChangeTarget(cameraPosition);
-        yield return new WaitForSeconds(time);
-        
-        Camera.main.transform.parent.GetComponent<CameraMovement>().ChangeTarget(cameraPosition);
-        Ray ray = new Ray(ragdoll.GetRagdollRoot().transform.position, Vector3.down);
-        RaycastHit hit;
-        if (Physics.SphereCast(ray, 0.25f, out hit, 2f, LayerMask.NameToLayer("Terrain"))) {
-            transform.position = hit.point;
-        }
-        else {
-            transform.position = ragdoll.GetRagdollRoot().transform.position;
-        }
+    public void PlayerRagdollStart(Vector3 force) {
+        playerState = PlayerState.Ragdoll;
+        movement.canInput = false;
+        PawnComponentsActivity(false);
+        ragdoll.StartRagdoll(force);
+        cameraPosition.transform.parent = ragdoll.hip.transform;
+        cameraPosition.transform.position = ragdoll.hip.transform.position + Vector3.up;
+        Camera.main.transform.parent.GetComponent<CameraMovement>().ChangeTarget(cameraPosition, false);
+    }
 
-        Vector3 hipUp = -ragdoll.hip.transform.right;
-        hipUp.y = 0f;
-        if (hipUp.sqrMagnitude > 0.001f) {
-            hipUp.Normalize();
-            Quaternion targetRotation = Quaternion.LookRotation(hipUp);
-            transform.rotation = targetRotation;
-        }
-        
-        bool hipForward = ragdoll.hip.transform.forward.y > 0;
-        Debug.Log("hipForward "+(hipForward ? "위" : "아래"));
-        if (hipForward == true) {
-            ani.SetBool(animIDStandFront, true);
-            transform.Rotate(0, 180, 0);
-        }
-        else {
-            ani.SetBool(animIDStandBack, true);
-        }
+    public void PlayerRagdollFinish() {
+        playerState = PlayerState.Standup;
+        PawnComponentsActivity(true);
+        cameraPosition.transform.parent = this.gameObject.transform;
+        cameraPosition.transform.localPosition = cameraPositionOffset;
+        Camera.main.transform.parent.GetComponent<CameraMovement>().ChangeTarget(cameraPosition, true);
+    }
 
-        ChangePawnActivity(true);
-        yield return new WaitForSeconds(5f);
-        PlayerController.canInput = true;
+    public void PlayerStandUpFinish() {
+        playerState = PlayerState.Idle;
+        movement.canInput = true;
     }
     
     public void OnTriggerEnter(Collider other) {

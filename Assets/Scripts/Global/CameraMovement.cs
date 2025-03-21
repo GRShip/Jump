@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class CameraMovement : MonoBehaviour {
     public GameObject attach;
@@ -19,11 +20,9 @@ public class CameraMovement : MonoBehaviour {
     private float forwardYaw = 0f;
     private float forwardPitch = 0f;
     
-    private PlayerPawnController PlayerController { get; set; }
-
-    private void Start() {
-        PlayerController = GameObject.Find("PlayerManager").GetComponent<PlayerPawnController>();
-    }
+    private bool holdRotate = false;
+    
+    private Vector2 lookInput;
 
     private void LateUpdate() {
         if (!attach) {
@@ -78,17 +77,18 @@ public class CameraMovement : MonoBehaviour {
         return Quaternion.Slerp(current, target, t);
     }
 
-    public void ChangeTarget(GameObject next) {
+    public void ChangeTarget(GameObject next, bool rotatehold) {
         attach = next;
         posFlag = false;
         rotFlag = false;
+        holdRotate = rotatehold;
     }
     
     private void CameraRotation() {
-        if (PlayerController.lookInput.sqrMagnitude >= 0.01f) {
+        if (lookInput.sqrMagnitude >= 0.01f) {
             //마우스 이동
-            forwardYaw += PlayerController.lookInput.x * Time.deltaTime * forwardRotationRate;
-            forwardPitch += -PlayerController.lookInput.y * Time.deltaTime * forwardRotationRate;
+            forwardYaw += lookInput.x * Time.deltaTime * forwardRotationRate;
+            forwardPitch += -lookInput.y * Time.deltaTime * forwardRotationRate;
         }
         
         //오버플로방지
@@ -98,8 +98,12 @@ public class CameraMovement : MonoBehaviour {
         //회전
         transform.rotation = Quaternion.Euler(forwardPitch, forwardYaw, 0.0f);
 
-        if (attach) {
+        if (attach && holdRotate) {
             attach.transform.rotation = transform.rotation;
         }
+    }
+
+    public void OnLook(InputValue value) {
+        lookInput = value.Get<Vector2>();
     }
 }

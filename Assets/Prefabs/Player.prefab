@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 5617235045837675673}
   - component: {fileID: 1354268166915371470}
   - component: {fileID: 2747414795668782167}
-  - component: {fileID: 9169648451253349628}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -74,6 +73,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1615bd3e05344b8aafb264bb1d4b112, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  controller: {fileID: 0}
   cameraPosition: {fileID: 6634916148555396356}
 --- !u!114 &2747414795668782167
 MonoBehaviour:
@@ -87,6 +87,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55949d1c620ef4a769b59b8f00aca8a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canInput: 0
   moveSpeed: 2
   sprintSpeed: 6
   speedChangeRate: 10
@@ -101,25 +102,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   forwardPosition: {fileID: 6634916148555396356}
-  forwardPitchTop: 60
-  forwardPitchBottom: -60
-  forwardRotationRate: 10
---- !u!114 &9169648451253349628
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1302435658433046949}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3812f9868c394266a47da89aeee46cb4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pushLayers:
-    serializedVersion: 2
-    m_Bits: 2048
-  strength: 1.1
 --- !u!1 &2934189264150328846
 GameObject:
   m_ObjectHideFlags: 0
@@ -168,7 +150,7 @@ Animator:
   m_Controller: {fileID: 9100000, guid: 45ed2fc0bdf390f41a2814059e452a40, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0
@@ -232,6 +214,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hip: {fileID: 7426274030704381524}
+  standUpTime: 0.5
+  ragdollTime: 3
+  standUpFrontName: StandUpFront
+  standUpFrontClipName: Standup_Front
+  standUpBackName: StandUpBack
+  standUpBackClipName: Standup_Back
 --- !u!1 &6634916148555396356
 GameObject:
   m_ObjectHideFlags: 0
@@ -241,6 +229,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 218351312652450956}
+  - component: {fileID: 513861759520507565}
   m_Layer: 8
   m_Name: CameraPos
   m_TagString: Untagged
@@ -263,6 +252,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1204874952761580186}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &513861759520507565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6634916148555396356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f439bda4000c4c7ca394ee4723b50072, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  keepRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1001 &3498763929114410582
 PrefabInstance:
   m_ObjectHideFlags: 0

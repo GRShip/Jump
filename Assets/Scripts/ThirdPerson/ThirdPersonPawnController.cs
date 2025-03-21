@@ -2,42 +2,48 @@
 
 public class ThirdPersonPawnController : MonoBehaviour {
 	public GameObject pawnPrefab;
-	protected GameObject PawnInstance;
+	protected ThirdPersonPawn PawnInstance;
 
 	public void CreatePawn() {
-		AttachToPawn(pawnPrefab);
-	}
-
-	public GameObject GetPawn() {
-		return PawnInstance;
-	}
-	
-	private void AttachToPawn(GameObject instance) {
-		PawnInstance = Instantiate(instance);
-		if (PawnInstance == null) {
-			Debug.LogWarning("Pawn Instantiate 실패");
+		if (!pawnPrefab.TryGetComponent<ThirdPersonPawn>(out var pawn)) {
+			Debug.LogWarning("pawnPrefab에 Pawn 컴포넌트 없음");
 			return;
 		}
 		
-		ThirdPersonPawn pawn = PawnInstance.GetComponent<ThirdPersonPawn>();
-		if (pawn) {
-			pawn.PossessController(this);
+		GameObject instance = Instantiate(pawnPrefab);
+		AttachToPawn(instance);
+	}
+
+	public ThirdPersonPawn GetPawn() {
+		return PawnInstance;
+	}
+	
+	public void AttachToPawn(GameObject instance) {
+		ThirdPersonPawn pawn;
+		if (instance.TryGetComponent(out pawn)) {
+			PawnInstance = pawn;
+			pawn.controller = this;
+			/*
 			pawn.ControllerUnposses += (unpossesPawn) => {
 				if (unpossesPawn == PawnInstance) {
 					DetachFromPawn();
-					pawn.ControllerUnposses = null;
 				}
-			};
+			};*/
+			pawn.Possess(this);
 			AttachPawn(pawn);
 		}
 		else {
-			Debug.LogWarning("생성된 객체에 ThirdPersonPawn 컴포넌트가 없음.");
+			Debug.LogWarning("지정된 객체에 Pawn 컴포넌트 없음.");
 		}
 	}
 	
-	private void DetachFromPawn() {
-		PawnInstance = null;
+	public void DetachFromPawn() {
+		if (PawnInstance) {
+			PawnInstance.UnPossess();
+			PawnInstance.controller = null;
+		}
 		DetachPawn();
+		PawnInstance = null;
 	}
 
 	protected virtual void AttachPawn(ThirdPersonPawn pawn) { }

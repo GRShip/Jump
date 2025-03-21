@@ -3,11 +3,16 @@
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(ThirdPersonPawn))]
 public class PlayerMovement : MonoBehaviour, IPawnComponent {
+    public ThirdPersonPawn Owner { get; private set; }
+    
     private CharacterController cc;
     private Animator ani;
-    public ThirdPersonPawnController Controller { get; private set; }
-    private PlayerPawnController PlayerController { get; set; }
-    
+    private PlayerPawnController playerController;
+    private bool hasController = false;
+
+    [HideInInspector]
+    public bool canInput = false;
+
     [Header("플레이어")]
     [Tooltip("걷기속도")]
     public float moveSpeed = 2f;
@@ -34,7 +39,7 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
     [Tooltip("중력 세기")]
     public float gravityPower = -9.81f;
     private float vspeed = 0f;
-    private const float vspeedMax = 53.0f;
+    private const float VspeedMax = 53.0f;
     private float fallTime = 0f;
     private const float FallDelay = 0.15f;
     
@@ -51,48 +56,34 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
     [Header("전방")]
     [Tooltip("전방위치")]
     public GameObject forwardPosition;
-    [Tooltip("상승최대각도")]
-    public float forwardPitchTop = 60.0f;
-    [Tooltip("하강최대각도")]
-    public float forwardPitchBottom = -60.0f;
-    [Tooltip("회전감도")]
-    public float forwardRotationRate = 10f;
-    private float forwardYaw = 0f;
-    private float forwardPitch = 0f;
     private float targetRotation = 0f;
     
-
     private int animIDSpeed;
     private int animIDLand;
     private int animIDJump;
     private int animIDFall;
     
     private void Awake() {
+        Owner = GetComponentInParent<PlayerPawn>();
         cc = GetComponent<CharacterController>();
+        ani = GetComponentInChildren<Animator>();
     }
 
     private void Start() {
-        ani = GetComponentInChildren<Animator>();
-        Controller = GetComponent<PlayerPawn>().GetController();
-        PlayerController = Controller as PlayerPawnController;
-        
+        playerController = (Owner as PlayerPawn)?.PlayerController;
         AssignAnimation();
     }
 
     private void Update() {
-        //if (TryGetComponent(out _ctrl) == false) {
-        if (cc.enabled == false) {
+        if (cc.enabled == false || canInput == false) {
             return;
         }
 
-        if ((!PlayerController) || (PlayerController.canInput == false)) {
-            return;
-        }
-
+        hasController = (playerController != null);
+        
         GroundedCheck();
         Gravity();
         Move();
-        //CameraRotation();
     }
 
     private void AssignAnimation() {
@@ -125,7 +116,7 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
             }
         }
         
-        if (PlayerController && PlayerController.jumpInput == true) {
+        if (hasController == true && playerController.jumpInput == true) {
             if (jumpCount < jumpCountMax) {
                 if (jumpHoldFlag == false) {
                     jumpCount += 1;
@@ -147,7 +138,7 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
             }
         }
         
-        if (vspeed < vspeedMax) {
+        if (vspeed < VspeedMax) {
             vspeed += gravityPower * Time.deltaTime;
         }
     }
@@ -159,32 +150,15 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
         ani.SetBool(animIDLand, onGround);
     }
     
-    private void CameraRotation() {
-        if (!PlayerController) { return; }
-        
-        if (PlayerController.lookInput.sqrMagnitude >= 0.01f) {
-            //마우스 이동
-            forwardYaw += PlayerController.lookInput.x * Time.deltaTime * forwardRotationRate;
-            forwardPitch += -PlayerController.lookInput.y * Time.deltaTime * forwardRotationRate;
-        }
-        
-        //오버플로방지
-        forwardYaw = Mathf.Clamp(forwardYaw, float.MinValue, float.MaxValue);
-        forwardPitch = Mathf.Clamp(forwardPitch, forwardPitchBottom, forwardPitchTop);
-        
-        //회전
-        forwardPosition.transform.rotation = Quaternion.Euler(forwardPitch, forwardYaw, 0.0f);
-    }
-
     private void Move() {
         if (!cc) {
             return;
         }
         
-        if (PlayerController) {
+        if (hasController == true) {
             //목표 속도
-            float targetSpeed = PlayerController.sprintInput ? sprintSpeed : moveSpeed;
-            if (PlayerController.moveInput == Vector2.zero) {
+            float targetSpeed = playerController.sprintInput ? sprintSpeed : moveSpeed;
+            if (playerController.moveInput == Vector2.zero) {
                 targetSpeed = 0.0f;
             }
 
@@ -196,10 +170,10 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
             else {
                 hspeed = Mathf.Lerp(currentSpeed, targetSpeed, Time.deltaTime * speedChangeRate);
             }
-            Vector3 inputDirection = new Vector3(PlayerController.moveInput.x, 0.0f, PlayerController.moveInput.y)
+            Vector3 inputDirection = new Vector3(playerController.moveInput.x, 0.0f, playerController.moveInput.y)
                 .normalized;
             //입력 방향
-            if (PlayerController.moveInput != Vector2.zero) {
+            if (playerController.moveInput != Vector2.zero) {
                 targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
                                  forwardPosition.transform.eulerAngles.y;
 

@@ -6,8 +6,6 @@ using UnityEngine.InputSystem;
 public class PlayerPawnController : ThirdPersonPawnController {
     public static PlayerPawnController Instance;
     
-    public bool canInput = false;
-    
     [Header("입력")]
     [Tooltip("이동 입력값")]
     public Vector2 moveInput;
@@ -64,20 +62,18 @@ public class PlayerPawnController : ThirdPersonPawnController {
     protected override void AttachPawn(ThirdPersonPawn pawn) {
         PlayerPawn player = pawn as PlayerPawn;
         if (player) {
-            Camera.main.transform.parent.GetComponent<CameraMovement>().ChangeTarget(player.cameraPosition);
-
+            Camera.main.transform.parent.GetComponent<CameraMovement>().ChangeTarget(player.cameraPosition, true);
+            
             Transform tf = GameManager.Instance.LoadPosition();
             pawn.gameObject.transform.position = tf.position;
             pawn.gameObject.transform.rotation = tf.rotation;
-            Physics.SyncTransforms();
-            canInput = true;
+            Physics.SyncTransforms();   //물리정보 동기화
         }
     }
 
     protected override void DetachPawn() {
-        canInput = false;
         if (this != null) {
-            StartCoroutine(CreateDelay(3f));
+            
         }
     }
 

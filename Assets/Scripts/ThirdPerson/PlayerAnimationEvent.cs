@@ -8,7 +8,7 @@ public class FootstepEvent : UnityEvent<AnimationEvent> { }
 public class LandEvent : UnityEvent<AnimationEvent> { }
 
 public class PlayerAnimationEvent : MonoBehaviour, IPawnComponent {
-    public ThirdPersonPawnController Controller { get; private set; }
+    public ThirdPersonPawn Owner { get; private set; }
     
     /*
     public delegate void Footstep(AnimationEvent animationEvent);
@@ -24,7 +24,7 @@ public class PlayerAnimationEvent : MonoBehaviour, IPawnComponent {
     private LandEvent EventLand;
     
     void Start() {
-        Controller = GetComponentInParent<PlayerPawn>().GetController();
+        Owner = GetComponentInParent<PlayerPawn>();
         //delegateFootstep += transform.parent.GetComponent<PlayerMovement>().OnFootstep;
         //delegateLand += transform.parent.GetComponent<PlayerMovement>().OnLand;
     }

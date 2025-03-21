@@ -13,7 +13,7 @@ public class SavePoint : MonoBehaviour {
             if (GameManager.Instance.GetSaveIndex() <= index) {
                 PlayerPawn pawn = other.gameObject.GetComponent<PlayerPawn>();
                 if ((pawn) && (pawn.GetController())) {
-                    Debug.Log("SavePoint");
+                    Debug.Log("Call Save");
                     GameManager.Instance.SavePosition(gameObject.transform, index);
                 }
             }

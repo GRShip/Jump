@@ -17,7 +17,7 @@ public class SpringArm : MonoBehaviour {
 		armPrevious = armCurrent;
 		armCurrent = GetLength();
 		Vector3 armPosition = Vector3.back * armCurrent;
-
+		
 		if (armPrevious <= armCurrent) {
 			arm.transform.localPosition = Vector3.SmoothDamp(arm.transform.localPosition, armPosition, ref armVelocity, smoothTime);
 		}
@@ -25,22 +25,13 @@ public class SpringArm : MonoBehaviour {
 			arm.transform.localPosition = armPosition;
 		}
 	}
-
-	public void OnWheel(InputValue input) {
-		if (input.Get<float>() == 0) {
-			return;
-		}
-		float value = input.Get<float>() > 0f ? -0.5f : 0.5f;
-		length += value;
-		length = Mathf.Clamp(length, 1, 10);
-	}
-
+	
 	private float GetLength() {
 		Ray ray = new Ray(transform.position, -transform.forward);
 		RaycastHit hit;
 		
 		//구 캐스트
-		if (Physics.SphereCast(ray, Mathf.Max(0.01f, radius), out hit, length, collisionLayer)) {
+		if (Physics.SphereCast(ray, radius, out hit, length, collisionLayer)) {
 			return hit.distance;
 		}
 		return length;
@@ -53,6 +44,15 @@ public class SpringArm : MonoBehaviour {
 			Gizmos.DrawLine(transform.position, arm.transform.position);
 			Gizmos.DrawWireSphere(arm.transform.position, radius);
 		}
+	}
+	
+	public void OnWheel(InputValue input) {
+		if (input.Get<float>() == 0) {
+			return;
+		}
+		float value = input.Get<float>() > 0f ? -0.5f : 0.5f;
+		length += value;
+		length = Mathf.Clamp(length, 1, 10);
 	}
 	
 	public void DeActive() {

@@ -3,13 +3,13 @@ using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(ThirdPersonPawn))]
 public class ThirdPersonInteract : MonoBehaviour, IPawnComponent {
-    public ThirdPersonPawnController Controller { get; private set; }
+    public ThirdPersonPawn Owner { get; private set; }
     
     [Min(0)] public float length = 5.0f;
     public LayerMask collisionLayer = -1;
 
     private void Start() {
-        Controller = GetComponent<ThirdPersonPawn>().GetController();
+        Owner = GetComponent<PlayerPawn>();
     }
     
     private void Raycasting() {

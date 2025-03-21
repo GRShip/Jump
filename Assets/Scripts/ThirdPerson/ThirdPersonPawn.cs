@@ -1,40 +1,22 @@
-using System;
 using UnityEngine;
 
 public class ThirdPersonPawn : MonoBehaviour {
-    protected ThirdPersonPawnController controller;
-    public Action<GameObject> ControllerUnposses;
+    public ThirdPersonPawnController controller = null;
+    //public Action<GameObject> ControllerUnposses;
     private IPawnComponent[] pawnComponents;
+    
+    protected virtual void Awake() {
+        pawnComponents = GetComponentsInChildren<IPawnComponent>();
+    }
     
     public ThirdPersonPawnController GetController() {
         return controller;
     }
     
-    protected virtual void Awake() {
-        controller = null;
-    }
+    public virtual void Possess(ThirdPersonPawnController ctrl) {}
+    public virtual void UnPossess() {}
 
-    protected virtual void Start() {
-        pawnComponents = GetComponentsInChildren<IPawnComponent>();
-    }
-    
-    public void PossessController(ThirdPersonPawnController ctrl) {
-        controller = ctrl;
-        Possess(ctrl);
-    }
-
-    public void UnPossessController() {
-        UnPossess();
-        controller = null;
-        if (ControllerUnposses != null) {
-            ControllerUnposses(gameObject);
-        }
-    }
-
-    protected virtual void Possess(ThirdPersonPawnController ctrl) {}
-    protected virtual void UnPossess() {}
-
-    protected void ChangePawnActivity(bool newActivity) {
+    protected void PawnComponentsActivity(bool newActivity) {
         foreach (IPawnComponent component in pawnComponents) {
             if (newActivity) {
                 component.Active();
