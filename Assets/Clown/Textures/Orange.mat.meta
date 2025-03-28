@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: a14d011ae93b8f348bb995bebb356bab
+guid: d239c9c3cf3cf6f4ea1ab54cf09bf36f
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 2100000
@@ -11,5 +11,5 @@ AssetOrigin:
   productId: 293261
   packageName: Experimental Stickman - Created with FastMesh Asset
   packageVersion: 1.0
-  assetPath: Assets/FastMesh/Materials/Red.mat
+  assetPath: Assets/FastMesh/Materials/Orange.mat
   uploadId: 686894
