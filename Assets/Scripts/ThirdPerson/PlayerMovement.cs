@@ -104,7 +104,7 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
             jumpHold = 0;
             
             if (vspeed < 0.0f) {
-                vspeed = -2f;  //-0.2보다 크면 ctrl.isGrounded값이 불안정해짐
+                vspeed = -0.2f;
             }
         }
         else {
