@@ -6,6 +6,7 @@ public class SavePoint : MonoBehaviour {
     private BoxCollider box;
     
     private void OnTriggerEnter(Collider other) {
+        Debug.Log(other.gameObject.name);
         switch (other.gameObject.tag) {
         case "Player":
             if (GameManager.Instance.GetSaveIndex() <= index) {
