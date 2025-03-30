@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
@@ -7,11 +9,13 @@ public class GameManager : MonoBehaviour {
 	[SerializeField]
 	private int saveIndex = 0;
 	
-	public Transform PlayerSpawn { get; private set; }
-
 	[Tooltip("마우스잠금")]
 	public bool cursorLocked = true;
 
+	public GameState gameState { get; private set; }
+
+	public UIGameOver uiGameOver;
+	
 	private void Awake() {
 		if (Instance == null) {
 			Instance = this;
@@ -21,10 +25,10 @@ public class GameManager : MonoBehaviour {
 			Destroy(gameObject);
 			return;
 		}
-
+		
 		//임시
 		SceneManager.sceneLoaded += SceneLoaded;
-		PlayerSpawn = gameObject.transform;
+		gameState = GameState.Noone;
 	}
 
 	private void OnDestroy() {
@@ -48,13 +52,30 @@ public class GameManager : MonoBehaviour {
 	private void SceneLoaded(Scene scene, LoadSceneMode mode) {
 		if (SceneManager.GetActiveScene().name != "SampleScene") return;
 		SetCursorState(cursorLocked);
+		
+		GameObject ui = GameObject.Find("UI_GameOver");
+		uiGameOver = ui.GetComponent<UIGameOver>();
+		if (uiGameOver) {
+			uiGameOver.SetEnable(false);
+		}
 		GameStart();
 	}
-
+	
 	public void GameStart() {
+		gameState = GameState.Play;
 		PlayerPawnController pc = GameObject.Find("PlayerManager").GetComponent<PlayerPawnController>();
 		pc.CreatePawn();
+		if (uiGameOver) {
+			uiGameOver.SetEnable(false);
+		}
 		Debug.Log(pc.GetPawn().transform.position.ToString());
+	}
+
+	public void GameOver() {
+		gameState = GameState.GameOver;
+		if (uiGameOver) {
+			uiGameOver.SetEnable(true);
+		}
 	}
 
 	public void SavePosition(Transform tf, int index) {

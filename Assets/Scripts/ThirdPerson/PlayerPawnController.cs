@@ -73,7 +73,7 @@ public class PlayerPawnController : ThirdPersonPawnController {
 
     protected override void DetachPawn() {
         if (this != null) {
-            
+            GameManager.Instance.GameOver();
         }
     }
 

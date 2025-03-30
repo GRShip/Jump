@@ -36,6 +36,7 @@ public class PlayerPawn : ThirdPersonPawn {
         controller = ctrl;
         PlayerController = ctrl as PlayerPawnController;
         movement.canInput = true;
+        PawnComponentsActivity(true);
     }
 
     public override void UnPossess() {

@@ -1,11 +1,10 @@
-using System;
 using UnityEditor;
 using UnityEngine;
-using Vector3 = System.Numerics.Vector3;
 
 public class SavePoint : MonoBehaviour {
     public int index = 0;
-
+    private BoxCollider box;
+    
     private void OnTriggerEnter(Collider other) {
         Debug.Log(other.gameObject.name);
         switch (other.gameObject.tag) {
@@ -22,7 +21,12 @@ public class SavePoint : MonoBehaviour {
     }
     
     private void OnDrawGizmos() {
-        Gizmos.color = Color.yellow;
+        box = GetComponent<BoxCollider>();
+        Gizmos.color = Color.red;
+        Matrix4x4 oldMatrix = Gizmos.matrix;
+        Gizmos.matrix = transform.localToWorldMatrix;
+        Gizmos.DrawWireCube(box.center, box.size);
+        Gizmos.matrix = oldMatrix;
         Handles.Label(transform.position, $"index: {index}");
     }
 }

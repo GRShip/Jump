@@ -23,3 +23,9 @@ public enum PlayerState {
     Ragdoll,
     Standup
 }
+
+public enum GameState {
+    Noone,
+    Play,
+    GameOver,
+}
