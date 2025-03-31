@@ -112,16 +112,11 @@ ModelImporter:
     skeleton:
     - name: Stickman9 Rig@Drunk Run Backward(Clone)
       parentName: 
-      position: {x: 0, y: 0, z: 0}
-      rotation: {x: 0, y: 0, z: 0, w: 1}
-      scale: {x: 1, y: 1, z: 1}
-    - name: Stickman 9
-      parentName: Stickman9 Rig@Drunk Run Backward(Clone)
       position: {x: -0, y: 0, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Hips
-      parentName: Stickman 9
+      parentName: Stickman9 Rig@Drunk Run Backward(Clone)
       position: {x: -0.00043547852, y: 0.24683033, z: 0.015342271}
       rotation: {x: -0.22836839, y: -0.0011166146, z: 0.0062785223, w: 0.97355396}
       scale: {x: 1, y: 1, z: 1}
@@ -320,13 +315,13 @@ ModelImporter:
     globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
-    hasExtraRoot: 1
+    hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   autoGenerateAvatarMappingIfUnspecified: 1
-  animationType: 2
+  animationType: 3
   humanoidOversampling: 1
-  avatarSetup: 0
+  avatarSetup: 1
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
   importBlendShapeDeformPercent: 1
   remapMaterialsIfMaterialImportModeIsNone: 0
