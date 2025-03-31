@@ -127,6 +127,7 @@ public class PlayerMovement : MonoBehaviour, IPawnComponent {
             }
         }
         else {
+            ani.SetBool(animIDJump, false);
             jumpHoldFlag = false;
         }
 

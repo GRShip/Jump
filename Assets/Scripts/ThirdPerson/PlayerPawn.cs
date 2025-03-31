@@ -14,7 +14,7 @@ public class PlayerPawn : ThirdPersonPawn {
         base.Awake();
         
         movement = GetComponent<PlayerMovement>();
-        ragdoll = transform.Find("Mannequin").Find("Clown").Find("Stickman_9").GetComponent<PawnRagdoll>();
+        ragdoll = transform.Find("Mannequin").GetComponent<PawnRagdoll>();
         cameraPositionOffset = cameraPosition.transform.localPosition;
     }
     

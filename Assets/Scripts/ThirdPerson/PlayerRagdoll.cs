@@ -116,7 +116,7 @@ public class PawnRagdoll : MonoBehaviour, IPawnComponent {
     private void AlignRoatationToHips() {
         Vector3 originalPosition = hip.transform.position;
         Quaternion originalRotation = hip.transform.rotation;
-        Vector3 desiredDirection = hip.transform.right; //방향
+        Vector3 desiredDirection = -hip.transform.up; //방향
         if (standUpFront == false) {
             desiredDirection *= -1;
         }
