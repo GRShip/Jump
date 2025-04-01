@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour {
 	
 	//임시
 	private void SceneLoaded(Scene scene, LoadSceneMode mode) {
-		if (SceneManager.GetActiveScene().name != "SampleScene") return;
+		if ((SceneManager.GetActiveScene().name != "SampleScene") && (SceneManager.GetActiveScene().name != "asdasd")) return;
 		SetCursorState(cursorLocked);
 		
 		GameObject ui = GameObject.Find("UI_GameOver");

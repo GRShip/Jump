@@ -31,6 +31,9 @@ public class SmartCannon : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        player = PlayerPawnController.Instance.GetPawn().gameObject;
+        if (player == null) { return; }
+
         if (iscool == cool.Active)
         {
             if (Vector3.Distance(player.transform.position, transform.position) <= sight)
@@ -38,7 +41,7 @@ public class SmartCannon : MonoBehaviour
                 time += Time.deltaTime;
 
                 transform.rotation = Quaternion.LookRotation
-                    ((player.transform.position - transform.position).normalized);
+                    (((player.transform.position + new Vector3(0, 0.5f, 0)) - transform.position).normalized);
 
                 Ray ray = new Ray(fireTransform.position, fireTransform.forward);
 

@@ -19,5 +19,10 @@ public class CannonBall : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         Destroy(gameObject, 2f);
+
+        if (collision.gameObject.name.Contains("Player"))
+        {
+            collision.gameObject.GetComponentInChildren<PawnRagdoll>().StartRagdoll(Vector3.zero);
+        }
     }
 }

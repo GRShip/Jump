@@ -40,7 +40,10 @@ public class Bear : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        switch(stat)
+        player = PlayerPawnController.Instance.GetPawn().gameObject;
+        if (player == null ) { return; }
+
+        switch (stat)
         {
             case State.Idle:
                 Idle();
@@ -59,6 +62,7 @@ public class Bear : MonoBehaviour
 
     void Idle()
     {
+        
         if (Vector3.Distance(transform.position, player.transform.position) < sight)
         {
             stat = State.Chase;
@@ -109,8 +113,7 @@ public class Bear : MonoBehaviour
 
     public void AttackAction()
     {
-        //플레이어 래그돌화 추가하기
-        //플레이어 밀치기 추가하기
+        player.GetComponentInChildren<PawnRagdoll>().StartRagdoll(transform.eulerAngles);
     }
 
     void Return()
