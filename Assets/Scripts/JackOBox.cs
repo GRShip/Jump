@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class JackOBox : MonoBehaviour
@@ -58,11 +57,22 @@ public class JackOBox : MonoBehaviour
                 time = 0;
             }
         }
+
     }
 
     IEnumerator Stop()
     {
         yield return new WaitForSeconds(1f);
         stat = state.Back;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("asd");
+        if (collision.gameObject.name.Contains("Player"))
+        {
+            collision.gameObject.GetComponentInChildren<PawnRagdoll>().ragdollTime = pushtime;
+            collision.gameObject.GetComponentInChildren<PlayerPawn>().PlayerRagdollStart(Vector3.zero);
+        }
     }
 }

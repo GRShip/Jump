@@ -21,7 +21,7 @@ public class PlayerPawn : ThirdPersonPawn {
     private void Update() {
         //Debug
         if (Input.GetMouseButtonDown(1) && movement.canInput == true) {
-            PlayerRagdollStart(Vector3.forward * 200);
+            PlayerRagdollStart(Vector3.zero);
             //PlayerDestroy();
         }
     }

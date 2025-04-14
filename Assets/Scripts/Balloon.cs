@@ -21,7 +21,10 @@ public class Balloon : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         Destroy(gameObject); //풍선 파괴
+        if (other.transform.root.name.Contains("Player"))
+        {
+            other.gameObject.transform.root.GetComponentInChildren<PawnRagdoll>().ragdollTime = pushtime;
+            other.gameObject.transform.root.GetComponentInChildren<PlayerPawn>().PlayerRagdollStart(Vector3.zero);
+        }
     }
-
-    //플레이어캐릭터 피격 시 플레이어 캐릭터의 피격 시 pushtime 넣어서 실행
 }

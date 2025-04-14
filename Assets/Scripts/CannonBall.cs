@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CannonBall : MonoBehaviour
 {
-    float pushtime = 0.5f;      //피격 시 PC가 래그돌 되는 시간
+    float pushtime = 1f;      //피격 시 PC가 래그돌 되는 시간
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -22,7 +22,8 @@ public class CannonBall : MonoBehaviour
 
         if (collision.gameObject.name.Contains("Player"))
         {
-            collision.gameObject.GetComponentInChildren<PawnRagdoll>().StartRagdoll(Vector3.zero);
+            collision.gameObject.GetComponentInChildren<PawnRagdoll>().ragdollTime = pushtime;
+            collision.gameObject.GetComponentInChildren<PlayerPawn>().PlayerRagdollStart(Vector3.zero);
         }
     }
 }

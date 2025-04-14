@@ -125,7 +125,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cannonball: {fileID: 6435068599403740458, guid: 481f126381d3cde4b862f4c1b968dded, type: 3}
   fireTransform: {fileID: 2837679511513230731}
-  cooltime: 3
+  cooltime: 5
   power: 20
   sight: 10
   player: {fileID: 0}

@@ -19,9 +19,9 @@ public class PawnRagdoll : MonoBehaviour, IPawnComponent {
     private BoneTransform[] ragdollBones;
     private bool standUpFront;
     [SerializeField]
-    private float standUpTime = 0.5f;
+    public float standUpTime = 0.1f;
     [SerializeField]
-    private float ragdollTime = 3f;
+    public float ragdollTime = 3f;
     
     [SerializeField]
     private string standUpFrontName;
