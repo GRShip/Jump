@@ -22,8 +22,8 @@ public class CannonBall : MonoBehaviour
 
         if (collision.gameObject.name.Contains("Player"))
         {
-            collision.gameObject.GetComponentInChildren<PawnRagdoll>().ragdollTime = pushtime;
-            collision.gameObject.GetComponentInChildren<PlayerPawn>().PlayerRagdollStart(Vector3.zero);
+            collision.gameObject.transform.root.GetComponentInChildren<PawnRagdoll>().ragdollTime = pushtime;
+            collision.gameObject.transform.root.GetComponentInChildren<PlayerPawn>().PlayerRagdollStart(Vector3.zero);
         }
     }
 }

@@ -65,14 +65,12 @@ public class JackOBox : MonoBehaviour
         yield return new WaitForSeconds(1f);
         stat = state.Back;
     }
-
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("asd");
-        if (collision.gameObject.name.Contains("Player"))
+        if (other.transform.root.name.Contains("Player"))
         {
-            collision.gameObject.GetComponentInChildren<PawnRagdoll>().ragdollTime = pushtime;
-            collision.gameObject.GetComponentInChildren<PlayerPawn>().PlayerRagdollStart(Vector3.zero);
+            other.gameObject.transform.root.GetComponentInChildren<PawnRagdoll>().ragdollTime = pushtime;
+            other.gameObject.transform.root.GetComponentInChildren<PlayerPawn>().PlayerRagdollStart(Vector3.zero);
         }
     }
 }
