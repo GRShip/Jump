@@ -113,7 +113,8 @@ public class Bear : MonoBehaviour
 
     public void AttackAction()
     {
-        player.GetComponentInChildren<PawnRagdoll>().StartRagdoll(transform.eulerAngles);
+        player.GetComponentInChildren<PawnRagdoll>().ragdollTime = pushtime;
+        player.GetComponentInChildren<PlayerPawn>().PlayerRagdollStart(transform.eulerAngles);
     }
 
     void Return()

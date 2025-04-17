@@ -15,14 +15,13 @@ public class Lava : MonoBehaviour
     {
         
     }
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        Destroy(gameObject, 2f);
-
-        if (collision.gameObject.name.Contains("Player"))
+        Debug.Log("asd");
+        if (other.transform.root.name.Contains("Player"))
         {
-            collision.gameObject.GetComponentInChildren<PawnRagdoll>().ragdollTime = pushtime;
-            collision.gameObject.GetComponentInChildren<PlayerPawn>().PlayerRagdollStart(Vector3.zero);
+            other.gameObject.transform.root.GetComponentInChildren<PawnRagdoll>().ragdollTime = pushtime;
+            other.gameObject.transform.root.GetComponentInChildren<PlayerPawn>().PlayerRagdollStart(Vector3.zero);
         }
     }
 }
