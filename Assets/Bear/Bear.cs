@@ -10,7 +10,7 @@ public class Bear : MonoBehaviour
     public float attPushtime = 1.5f;
 
     float currentTime = 0;
-    float attackDelay = 3f;
+    float attackDelay = 5f;
 
     Vector3 originPos;
     Quaternion originRot;

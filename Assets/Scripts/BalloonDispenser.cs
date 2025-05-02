@@ -6,7 +6,9 @@ public class BalloonDispenser : MonoBehaviour
     public Transform fireTransform;
 
     float time = 0;
+    public float speed = 4f;
     public float cooltime = 3f;
+    public bool immediateDestroy = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -21,6 +23,11 @@ public class BalloonDispenser : MonoBehaviour
         if ( time >= cooltime )
         {
             Rigidbody balloonInstance = Instantiate(balloon, fireTransform.position, fireTransform.rotation);
+            balloonInstance.GetComponent<Balloon>().speed = speed;
+            if (immediateDestroy)
+            {
+                balloonInstance.GetComponent<Balloon>().destroyTimer = cooltime;
+            }
 
             time = 0;
         }

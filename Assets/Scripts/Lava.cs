@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Lava : MonoBehaviour
 {
-    float pushtime = 3f;
+    float pushtime = 0.5f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -17,11 +17,10 @@ public class Lava : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("asd");
         if (other.transform.root.name.Contains("Player"))
         {
             other.gameObject.transform.root.GetComponentInChildren<PawnRagdoll>().ragdollTime = pushtime;
-            other.gameObject.transform.root.GetComponentInChildren<PlayerPawn>().PlayerRagdollStart(Vector3.zero);
+            other.gameObject.transform.root.GetComponentInChildren<PlayerPawn>().PlayerRagdollStart(Vector3.back);
         }
     }
 }

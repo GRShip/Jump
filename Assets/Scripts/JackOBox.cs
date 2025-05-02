@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class JackOBox : MonoBehaviour
 {
-    float time = 0;
+    public float time = 0f;
     public float cooltime = 2f;
     float pushtime = 0.2f;      //피격 시 PC가 래그돌 되는 시간
 

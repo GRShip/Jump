@@ -13,6 +13,7 @@ public class SmartCannon : MonoBehaviour
     public float power = 20f;
     public float sight = 10f;
     public GameObject player;
+    Vector3 originRot;
 
     enum cool
     {
@@ -26,6 +27,8 @@ public class SmartCannon : MonoBehaviour
     void Start()
     {
         projector = GetComponent<DecalProjector>();
+        originRot = transform.eulerAngles;
+        
     }
 
     // Update is called once per frame
@@ -87,6 +90,6 @@ public class SmartCannon : MonoBehaviour
     {
         time = 0;
         projector.pivot = Vector3.zero;
-        transform.eulerAngles = Vector3.zero;
+        transform.eulerAngles = originRot;
     }
 }

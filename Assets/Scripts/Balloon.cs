@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class Balloon : MonoBehaviour
 {
-    public float speed = 2;
+    public float speed = 4;
+    public float destroyTimer = 4f;
     float pushtime = 0.5f;      //피격 시 PC가 래그돌 되는 시간
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -15,7 +16,7 @@ public class Balloon : MonoBehaviour
     void Update()
     {
         transform.Translate(Vector3.forward * Time.deltaTime * speed); //풍선 전진
-        Destroy(gameObject, 5f);
+        Destroy(gameObject, destroyTimer);
     }
 
     private void OnTriggerEnter(Collider other)
