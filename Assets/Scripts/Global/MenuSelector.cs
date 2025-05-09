@@ -5,11 +5,11 @@ public class MenuSelector : MonoBehaviour {
 
     public void SelectNewGame() {
         GameManager.Instance.ResetPrefs();
-        SceneLoadManager.Instance.LoadSceneAsync("SampleScene");
+        SceneLoadManager.Instance.LoadSceneAsync("asdasd");
     }
 
     public void SelectContinueGame() {
-        SceneLoadManager.Instance.LoadSceneAsync("SampleScene");
+        SceneLoadManager.Instance.LoadSceneAsync("asdasd");
     }
 
     public void SelectExitGame() {

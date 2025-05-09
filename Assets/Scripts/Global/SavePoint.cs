@@ -20,13 +20,13 @@ public class SavePoint : MonoBehaviour {
         }
     }
     
-    private void OnDrawGizmos() {
-        box = GetComponent<BoxCollider>();
-        Gizmos.color = Color.red;
-        Matrix4x4 oldMatrix = Gizmos.matrix;
-        Gizmos.matrix = transform.localToWorldMatrix;
-        Gizmos.DrawWireCube(box.center, box.size);
-        Gizmos.matrix = oldMatrix;
-        Handles.Label(transform.position, $"index: {index}");
-    }
+    //private void OnDrawGizmos() {
+    //    box = GetComponent<BoxCollider>();
+    //    Gizmos.color = Color.red;
+    //    Matrix4x4 oldMatrix = Gizmos.matrix;
+    //    Gizmos.matrix = transform.localToWorldMatrix;
+    //    Gizmos.DrawWireCube(box.center, box.size);
+    //    Gizmos.matrix = oldMatrix;
+    //    Handles.Label(transform.position, $"index: {index}");
+    //}
 }
